@@ -1,0 +1,280 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name" translatable="false">Silverbox</string>
+    <string name="tagline">Shoot now. See tomorrow.</string>
+
+    <string name="back">Back</string>
+    <string name="cancel">Cancel</string>
+    <string name="save">Save</string>
+    <string name="next">Next</string>
+    <string name="done">Done</string>
+    <string name="close">Close</string>
+    <string name="share">Share</string>
+    <string name="rename">Rename</string>
+
+    <string name="tab_camera">Camera</string>
+    <string name="tab_album">Album</string>
+    <string name="tab_shelf">Shelf</string>
+
+    <!-- Camera -->
+    <string name="in_camera">In the camera</string>
+    <string name="camera_empty">The camera is empty</string>
+    <string name="camera_empty_text">Load a roll of film to start shooting. You won\'t see a single frame until the lab develops it.</string>
+    <string name="load_film">Load film</string>
+    <string name="loaded_on">loaded %s</string>
+    <string name="shoot">Shoot</string>
+    <string name="to_lab">Take to the lab</string>
+    <string name="to_lab_short">To the lab</string>
+    <string name="roll_full">The roll is finished. Rewind it and take it to the lab.</string>
+    <string name="roll_expired">This film is past its date: the colours will start to drift.</string>
+    <plurals name="roll_fresh_left">
+        <item quantity="one">Best shot within %d day, before the film starts to age.</item>
+        <item quantity="other">Best shot within %d days, before the film starts to age.</item>
+    </plurals>
+    <string name="cassette">8 mm cassette</string>
+    <string name="cassette_feet">%1$d / %2$d ft</string>
+    <string name="no_cassette">Shoot a video and it goes on an 8 mm cassette</string>
+    <string name="no_cassette_hint">Three seconds of each clip, cut into a home movie</string>
+    <string name="at_lab">At the lab</string>
+    <string name="lab_ready">ready %s</string>
+    <string name="lab_ready_express">express, ready %s</string>
+    <string name="lab_developing">being developed…</string>
+    <string name="shot_list">For this roll</string>
+    <string name="on_this_day">On this day</string>
+    <plurals name="years_ago">
+        <item quantity="one">%d year ago</item>
+        <item quantity="other">%d years ago</item>
+    </plurals>
+    <string name="today_at">today at %s</string>
+    <string name="tomorrow_at">tomorrow at %s</string>
+    <string name="date_at">on %1$s at %2$s</string>
+
+    <string name="ready_eyebrow">Ready at the lab</string>
+    <string name="ready_prints">Your photos are ready</string>
+    <string name="ready_film">Your film is ready</string>
+    <string name="ready_open">Open the envelope</string>
+    <string name="ready_open_film">Collect the film</string>
+    <string name="order_line">Order №%1$s · %2$s</string>
+
+    <string name="shooting_title">Shooting</string>
+    <string name="shooting_text">Whatever your camera takes now goes on the film. Come back here when you\'re done.</string>
+    <string name="shooting_back">Back to the camera</string>
+    <string name="shooting_done">Finish</string>
+    <plurals name="loaded_photos">
+        <item quantity="one">%d frame went on the film</item>
+        <item quantity="other">%d frames went on the film</item>
+    </plurals>
+    <plurals name="loaded_clips">
+        <item quantity="one">%d clip went on the cassette</item>
+        <item quantity="other">%d clips went on the cassette</item>
+    </plurals>
+    <plurals name="loaded_leftover">
+        <item quantity="one">%d didn\'t fit and stayed in the gallery</item>
+        <item quantity="other">%d didn\'t fit and stayed in the gallery</item>
+    </plurals>
+    <plurals name="loaded_no_roll">
+        <item quantity="one">No film in the camera: %d photo stayed in the gallery</item>
+        <item quantity="other">No film in the camera: %d photos stayed in the gallery</item>
+    </plurals>
+    <string name="no_camera">No camera app found on this phone</string>
+    <string name="no_access_title">No access to photos</string>
+    <string name="no_access_text">Allow access to all photos and videos, or the film can\'t see what your camera took.</string>
+    <string name="no_access_button">Allow access</string>
+
+    <plurals name="frames">
+        <item quantity="one">%d frame</item>
+        <item quantity="other">%d frames</item>
+    </plurals>
+    <plurals name="clips">
+        <item quantity="one">%d clip</item>
+        <item quantity="other">%d clips</item>
+    </plurals>
+    <plurals name="prints">
+        <item quantity="one">%d print</item>
+        <item quantity="other">%d prints</item>
+    </plurals>
+    <plurals name="rolls">
+        <item quantity="one">%d roll</item>
+        <item quantity="other">%d rolls</item>
+    </plurals>
+    <plurals name="films">
+        <item quantity="one">%d film</item>
+        <item quantity="other">%d films</item>
+    </plurals>
+
+    <!-- Loading -->
+    <string name="load_title">Load film</string>
+    <string name="load_cassette_title">Load a cassette</string>
+    <string name="load_hint">Every film has its own character. Choose one for what you\'re going to shoot.</string>
+    <string name="load_cassette_hint">Videos from your camera go on the cassette, three seconds each. Fifty of them make a home movie.</string>
+    <string name="exposures">Exposures</string>
+    <string name="roll_for">What is it for?</string>
+    <string name="roll_for_hint">Summer at Gran\'s</string>
+    <string name="cassette_for_hint">Our autumn</string>
+    <string name="roll_rules">You won\'t see the frames until the roll is developed. There is no deleting and no second take.</string>
+    <string name="cassette_rules">The film is cut at the lab: three seconds from the middle of each clip, silent, at 18 frames a second.</string>
+    <string name="load_do">Load</string>
+    <string name="stock_sunny">Warm and golden. Summer, sun, the dacha, faces that glow.</string>
+    <string name="stock_every">Natural and soft, with gentle greens. Home and the everyday.</string>
+    <string name="stock_night">Coarse grain and a red glow round every light. Evenings, garlands, candles.</string>
+    <string name="stock_silver">Black and white with deep blacks. Portraits, grandparents, moods.</string>
+    <string name="stock_slide">Rich and punchy, with deep blue skies. Travel, the sea, nature.</string>
+    <string name="stock_home8">Warm home-movie colour, the way the sixties looked.</string>
+    <string name="stock_silver8">Black-and-white silent film.</string>
+
+    <!-- The lab -->
+    <string name="lab_title">Photo lab</string>
+    <string name="receipt_shop">SILVERBOX PHOTO LAB</string>
+    <string name="receipt_sub">developing · printing · 10×15</string>
+    <string name="receipt_date">DATE</string>
+    <string name="receipt_film">FILM</string>
+    <string name="receipt_frames">FRAMES</string>
+    <string name="receipt_clips">CLIPS</string>
+    <string name="receipt_name">FOR</string>
+    <string name="receipt_service">SERVICE</string>
+    <string name="receipt_standard">standard</string>
+    <string name="receipt_express">express</string>
+    <string name="receipt_ready">READY</string>
+    <string name="receipt_thanks">thank you!</string>
+    <string name="service">Service</string>
+    <string name="service_standard">Standard</string>
+    <string name="service_standard_hint">Ready in a day</string>
+    <string name="service_express">Express</string>
+    <string name="service_express_hint">Ready in an hour. Once a week.</string>
+    <string name="service_express_next">Next express %s</string>
+    <plurals name="send_blank">
+        <item quantity="one">%d frame is left unshot. It will stay blank, as on real film.</item>
+        <item quantity="other">%d frames are left unshot. They will stay blank, as on real film.</item>
+    </plurals>
+    <string name="send_expired">The film sat in the camera a long time: expect faded, drifting colours.</string>
+    <string name="send_do">Hand it over</string>
+
+    <!-- The envelope -->
+    <string name="order_title">Order №%s</string>
+    <string name="env_photos">PHOTOS</string>
+    <string name="env_film">HOME MOVIE</string>
+    <string name="env_tap">Tap the envelope to open it</string>
+    <string name="env_open">Open</string>
+    <string name="env_next">Next</string>
+    <string name="env_swipe">Swipe the print aside for the next one</string>
+    <string name="env_end">That\'s the whole roll</string>
+    <string name="env_end_text">%1$s, and %2$s in the album. The negatives are on the shelf.</string>
+    <string name="env_contact">Contact sheet</string>
+    <string name="env_again">Look again</string>
+    <string name="to_album">To the album</string>
+    <string name="in_album">In the album</string>
+
+    <!-- A print -->
+    <string name="print_back">Turn over</string>
+    <string name="print_front">Turn back</string>
+    <string name="print_write">Write on the back…</string>
+    <string name="print_by">photo by</string>
+
+    <!-- Album and shelf -->
+    <string name="album">Album</string>
+    <string name="box">Shoebox</string>
+    <string name="album_title">The album</string>
+    <string name="box_title">The shoebox</string>
+    <string name="album_empty">The album is empty</string>
+    <string name="album_empty_text">Mark the best prints with a heart and they\'ll go in here, two to a page.</string>
+    <string name="box_empty">The shoebox is empty</string>
+    <string name="box_empty_text">Every print from every envelope ends up here.</string>
+    <string name="shelf_title">The shelf</string>
+    <string name="shelf_empty">Nothing on the shelf yet</string>
+    <string name="shelf_empty_text">Developed rolls are kept here, with their contact sheets and negatives.</string>
+    <string name="contact_sheet">Contact sheet</string>
+    <string name="negatives">Negatives</string>
+    <string name="roll_was_expired">expired film</string>
+    <string name="roll_delete">Throw the roll away</string>
+    <string name="roll_delete_text">Its prints, negatives and the camera\'s originals will be deleted for good.</string>
+    <string name="roll_delete_do">Throw away</string>
+
+    <!-- Film -->
+    <string name="film_watch">Watch the film</string>
+    <string name="film_play">Play</string>
+    <string name="film_sound">Projector sound</string>
+    <string name="film_default_title">Home movie</string>
+    <string name="film_end">The End</string>
+
+    <!-- Settings -->
+    <string name="settings_title">Settings</string>
+    <string name="set_shooting">Shooting</string>
+    <string name="set_hide">Hide shots from the gallery</string>
+    <string name="set_hide_hint">Once on the film, the camera\'s pictures go to the gallery\'s bin, so nobody peeks. The phone asks once each time.</string>
+    <string name="set_hide_old">Needs Android 11 or newer; here the pictures stay in the gallery.</string>
+    <string name="set_stamp">Date on the prints</string>
+    <string name="set_stamp_hint">The orange date in the corner, like an old point-and-shoot.</string>
+    <string name="set_keeper">Your name</string>
+    <string name="set_keeper_hint">Written on the backs of prints as the photographer.</string>
+    <string name="set_keeper_placeholder">Mum</string>
+    <string name="set_notify_section">Notices</string>
+    <string name="set_notify">When the envelope is ready</string>
+    <string name="set_notify_hint">One quiet notice per order. Nothing else.</string>
+    <string name="set_language">Language</string>
+    <string name="lang_system">System</string>
+    <string name="set_backup">Backup</string>
+    <string name="set_backup_hint">Everything is kept on this phone only. A backup is one zip with every roll, print and film.</string>
+    <string name="backup_export">Export</string>
+    <string name="backup_export_hint">Save Silverbox.zip anywhere</string>
+    <string name="backup_import">Import</string>
+    <string name="backup_import_hint">Replace everything with a backup</string>
+    <string name="backup_import_confirm">Everything in Silverbox now will be replaced with the backup.</string>
+    <string name="backup_import_do">Replace</string>
+    <string name="backup_done">Backup saved.</string>
+    <string name="backup_failed">Couldn\'t save the backup.</string>
+    <string name="backup_restored">Backup restored.</string>
+    <string name="backup_bad">That file isn\'t a Silverbox backup.</string>
+    <string name="about">Silverbox %s · part of Stillcraft · no ads, no account</string>
+
+    <!-- Onboarding -->
+    <string name="onb1_title">Shoot now.\nSee tomorrow.</string>
+    <string name="onb1_text">Silverbox is a film camera for the family. You shoot with your phone\'s own camera, the pictures go on a roll of film, and you won\'t see them until the lab develops it. Fewer pictures, more moments.</string>
+    <string name="onb2_title">How a roll goes round</string>
+    <string name="onb2_s1">Load a roll: 24 or 36 frames of the film you like</string>
+    <string name="onb2_s2">Shoot with your phone\'s camera, in any mode it has</string>
+    <string name="onb2_s3">When the roll is done, hand it in at the lab</string>
+    <string name="onb2_s4">A day later, open the envelope of prints</string>
+    <string name="onb3_title">One permission</string>
+    <string name="onb3_text">To put your camera\'s pictures on the film, Silverbox needs to see your photos and videos. Nothing ever leaves the phone.</string>
+    <string name="onb3_allow">Allow access</string>
+    <string name="onb3_allowed">Access granted. You\'re all set.</string>
+    <string name="onb_start">Load the first roll</string>
+
+    <!-- Notices -->
+    <string name="channel_lab">The lab</string>
+    <string name="channel_lab_desc">When an envelope is ready</string>
+    <string name="notif_title">Your photos are ready</string>
+    <string name="notif_prints">Order №%04d is waiting in its envelope.</string>
+    <string name="notif_film">Your film, order №%04d, is ready to watch.</string>
+    <plurals name="notif_many">
+        <item quantity="one">%d envelope is waiting.</item>
+        <item quantity="other">%d envelopes are waiting.</item>
+    </plurals>
+
+    <string-array name="prompts">
+        <item>Hands that cook</item>
+        <item>Someone asleep</item>
+        <item>The view from the window this morning</item>
+        <item>An ordinary dinner</item>
+        <item>Shoes by the door</item>
+        <item>Someone laughing, not looking at you</item>
+        <item>A grandparent\'s hands</item>
+        <item>The table after a meal</item>
+        <item>Your street today</item>
+        <item>A drawing on the fridge</item>
+        <item>Someone reading</item>
+        <item>Sunset light on the wall</item>
+        <item>The pet\'s favourite spot</item>
+        <item>Everyone together, even if it\'s blurry</item>
+        <item>The kitchen windowsill</item>
+        <item>The way home</item>
+        <item>Someone you love, close up</item>
+        <item>Morning coffee or tea</item>
+        <item>A mess you\'ll miss one day</item>
+        <item>The oldest thing in the house</item>
+        <item>Feet on a blanket</item>
+        <item>Your own shadow</item>
+        <item>Rain or snow on the glass</item>
+        <item>A hug</item>
+    </string-array>
+</resources>

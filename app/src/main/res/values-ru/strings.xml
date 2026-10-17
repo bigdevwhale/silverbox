@@ -1,0 +1,305 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="tagline">Снимай сейчас — смотри завтра.</string>
+
+    <string name="back">Назад</string>
+    <string name="cancel">Отмена</string>
+    <string name="save">Сохранить</string>
+    <string name="next">Дальше</string>
+    <string name="done">Готово</string>
+    <string name="close">Закрыть</string>
+    <string name="share">Поделиться</string>
+    <string name="rename">Переименовать</string>
+
+    <string name="tab_camera">Камера</string>
+    <string name="tab_album">Альбом</string>
+    <string name="tab_shelf">Полка</string>
+
+    <!-- Camera -->
+    <string name="in_camera">В камере</string>
+    <string name="camera_empty">Камера пуста</string>
+    <string name="camera_empty_text">Зарядите плёнку, чтобы начать снимать. Ни одного кадра вы не увидите, пока плёнку не проявят.</string>
+    <string name="load_film">Зарядить плёнку</string>
+    <string name="loaded_on">заряжена %s</string>
+    <string name="shoot">Снимать</string>
+    <string name="to_lab">Сдать в проявку</string>
+    <string name="to_lab_short">В проявку</string>
+    <string name="roll_full">Плёнка кончилась. Перемотайте её и сдайте в проявку.</string>
+    <string name="roll_expired">Срок плёнки вышел: цвета начнут уплывать.</string>
+    <plurals name="roll_fresh_left">
+        <item quantity="one">Плёнку лучше доснять за %d день, пока она не начала стареть.</item>
+        <item quantity="few">Плёнку лучше доснять за %d дня, пока она не начала стареть.</item>
+        <item quantity="many">Плёнку лучше доснять за %d дней, пока она не начала стареть.</item>
+        <item quantity="other">Плёнку лучше доснять за %d дня, пока она не начала стареть.</item>
+    </plurals>
+    <string name="cassette">Кассета 8 мм</string>
+    <string name="cassette_feet">%1$d / %2$d фт</string>
+    <string name="no_cassette">Снимите видео, и оно попадёт на кассету 8 мм</string>
+    <string name="no_cassette_hint">Три секунды от каждого ролика, смонтированные в домашнее кино</string>
+    <string name="at_lab">В фотоателье</string>
+    <string name="lab_ready">будет готово %s</string>
+    <string name="lab_ready_express">срочно, будет готово %s</string>
+    <string name="lab_developing">проявляется…</string>
+    <string name="shot_list">Для этой плёнки</string>
+    <string name="on_this_day">В этот день</string>
+    <plurals name="years_ago">
+        <item quantity="one">%d год назад</item>
+        <item quantity="few">%d года назад</item>
+        <item quantity="many">%d лет назад</item>
+        <item quantity="other">%d года назад</item>
+    </plurals>
+    <string name="today_at">сегодня в %s</string>
+    <string name="tomorrow_at">завтра в %s</string>
+    <string name="date_at">%1$s в %2$s</string>
+
+    <string name="ready_eyebrow">Готово в фотоателье</string>
+    <string name="ready_prints">Ваши фотографии готовы</string>
+    <string name="ready_film">Ваш фильм готов</string>
+    <string name="ready_open">Открыть конверт</string>
+    <string name="ready_open_film">Забрать фильм</string>
+    <string name="order_line">Заказ №%1$s · %2$s</string>
+
+    <string name="shooting_title">Идёт съёмка</string>
+    <string name="shooting_text">Всё, что сейчас снимет камера, попадёт на плёнку. Когда закончите, возвращайтесь сюда.</string>
+    <string name="shooting_back">Вернуться в камеру</string>
+    <string name="shooting_done">Закончить</string>
+    <plurals name="loaded_photos">
+        <item quantity="one">%d кадр попал на плёнку</item>
+        <item quantity="few">%d кадра попали на плёнку</item>
+        <item quantity="many">%d кадров попали на плёнку</item>
+        <item quantity="other">%d кадра попали на плёнку</item>
+    </plurals>
+    <plurals name="loaded_clips">
+        <item quantity="one">%d ролик попал на кассету</item>
+        <item quantity="few">%d ролика попали на кассету</item>
+        <item quantity="many">%d роликов попали на кассету</item>
+        <item quantity="other">%d ролика попали на кассету</item>
+    </plurals>
+    <plurals name="loaded_leftover">
+        <item quantity="one">%d не поместился и остался в галерее</item>
+        <item quantity="few">%d не поместились и остались в галерее</item>
+        <item quantity="many">%d не поместились и остались в галерее</item>
+        <item quantity="other">%d не поместились и остались в галерее</item>
+    </plurals>
+    <plurals name="loaded_no_roll">
+        <item quantity="one">В камере нет плёнки: %d снимок остался в галерее</item>
+        <item quantity="few">В камере нет плёнки: %d снимка остались в галерее</item>
+        <item quantity="many">В камере нет плёнки: %d снимков остались в галерее</item>
+        <item quantity="other">В камере нет плёнки: %d снимка остались в галерее</item>
+    </plurals>
+    <string name="no_camera">На телефоне не нашлось приложения камеры</string>
+    <string name="no_access_title">Нет доступа к фото</string>
+    <string name="no_access_text">Разрешите доступ ко всем фото и видео, иначе плёнка не увидит, что сняла камера.</string>
+    <string name="no_access_button">Разрешить доступ</string>
+
+    <plurals name="frames">
+        <item quantity="one">%d кадр</item>
+        <item quantity="few">%d кадра</item>
+        <item quantity="many">%d кадров</item>
+        <item quantity="other">%d кадра</item>
+    </plurals>
+    <plurals name="clips">
+        <item quantity="one">%d ролик</item>
+        <item quantity="few">%d ролика</item>
+        <item quantity="many">%d роликов</item>
+        <item quantity="other">%d ролика</item>
+    </plurals>
+    <plurals name="prints">
+        <item quantity="one">%d отпечаток</item>
+        <item quantity="few">%d отпечатка</item>
+        <item quantity="many">%d отпечатков</item>
+        <item quantity="other">%d отпечатка</item>
+    </plurals>
+    <plurals name="rolls">
+        <item quantity="one">%d плёнка</item>
+        <item quantity="few">%d плёнки</item>
+        <item quantity="many">%d плёнок</item>
+        <item quantity="other">%d плёнки</item>
+    </plurals>
+    <plurals name="films">
+        <item quantity="one">%d фильм</item>
+        <item quantity="few">%d фильма</item>
+        <item quantity="many">%d фильмов</item>
+        <item quantity="other">%d фильма</item>
+    </plurals>
+
+    <!-- Loading -->
+    <string name="load_title">Зарядить плёнку</string>
+    <string name="load_cassette_title">Зарядить кассету</string>
+    <string name="load_hint">У каждой плёнки свой характер. Выберите под то, что собираетесь снимать.</string>
+    <string name="load_cassette_hint">Видео с камеры попадают на кассету, по три секунды. Из пятидесяти получается домашнее кино.</string>
+    <string name="exposures">Кадров</string>
+    <string name="roll_for">Для чего она?</string>
+    <string name="roll_for_hint">Лето у бабушки</string>
+    <string name="cassette_for_hint">Наша осень</string>
+    <string name="roll_rules">Кадры вы не увидите, пока плёнку не проявят. Удалить или переснять нельзя.</string>
+    <string name="cassette_rules">Фильм монтируют в ателье: три секунды из середины каждого ролика, без звука, 18 кадров в секунду.</string>
+    <string name="load_do">Зарядить</string>
+    <string name="stock_sunny">Тёплая, золотистая. Лето, солнце, дача, светящиеся лица.</string>
+    <string name="stock_every">Естественная и мягкая, с нежной зеленью. Дом и будни.</string>
+    <string name="stock_night">Крупное зерно и красный ореол вокруг огней. Вечера, гирлянды, свечи.</string>
+    <string name="stock_silver">Чёрно-белая, с глубоким чёрным. Портреты, бабушки и дедушки, настроение.</string>
+    <string name="stock_slide">Сочная и контрастная, с густо-синим небом. Путешествия, море, природа.</string>
+    <string name="stock_home8">Тёплый цвет домашнего кино, как в шестидесятые.</string>
+    <string name="stock_silver8">Чёрно-белое немое кино.</string>
+
+    <!-- The lab -->
+    <string name="lab_title">Фотоателье</string>
+    <string name="receipt_shop">ФОТОАТЕЛЬЕ SILVERBOX</string>
+    <string name="receipt_sub">проявка · печать · 10×15</string>
+    <string name="receipt_date">ДАТА</string>
+    <string name="receipt_film">ПЛЁНКА</string>
+    <string name="receipt_frames">КАДРОВ</string>
+    <string name="receipt_clips">РОЛИКОВ</string>
+    <string name="receipt_name">ДЛЯ</string>
+    <string name="receipt_service">УСЛУГА</string>
+    <string name="receipt_standard">обычная</string>
+    <string name="receipt_express">срочная</string>
+    <string name="receipt_ready">ГОТОВО</string>
+    <string name="receipt_thanks">спасибо!</string>
+    <string name="service">Проявка</string>
+    <string name="service_standard">Обычная</string>
+    <string name="service_standard_hint">Будет готово через сутки</string>
+    <string name="service_express">Срочная</string>
+    <string name="service_express_hint">Будет готово через час. Раз в неделю.</string>
+    <string name="service_express_next">Следующая срочная — %s</string>
+    <plurals name="send_blank">
+        <item quantity="one">%d кадр не отснят. Он останется пустым, как на настоящей плёнке.</item>
+        <item quantity="few">%d кадра не отсняты. Они останутся пустыми, как на настоящей плёнке.</item>
+        <item quantity="many">%d кадров не отснято. Они останутся пустыми, как на настоящей плёнке.</item>
+        <item quantity="other">%d кадра не отснято. Они останутся пустыми, как на настоящей плёнке.</item>
+    </plurals>
+    <string name="send_expired">Плёнка долго пролежала в камере: цвета будут выцветшими и поплывшими.</string>
+    <string name="send_do">Сдать плёнку</string>
+
+    <!-- The envelope -->
+    <string name="order_title">Заказ №%s</string>
+    <string name="env_photos">ФОТО</string>
+    <string name="env_film">ДОМАШНЕЕ КИНО</string>
+    <string name="env_tap">Нажмите на конверт, чтобы открыть</string>
+    <string name="env_open">Открыть</string>
+    <string name="env_next">Дальше</string>
+    <string name="env_swipe">Смахните отпечаток, чтобы увидеть следующий</string>
+    <string name="env_end">Вот и вся плёнка</string>
+    <string name="env_end_text">%1$s, в альбом — %2$s. Негативы лежат на полке.</string>
+    <string name="env_contact">Контактный лист</string>
+    <string name="env_again">Посмотреть ещё раз</string>
+    <string name="to_album">В альбом</string>
+    <string name="in_album">В альбоме</string>
+
+    <!-- A print -->
+    <string name="print_back">Перевернуть</string>
+    <string name="print_front">Обратно</string>
+    <string name="print_write">Подпишите на обороте…</string>
+    <string name="print_by">снимал(а)</string>
+
+    <!-- Album and shelf -->
+    <string name="album">Альбом</string>
+    <string name="box">Коробка</string>
+    <string name="album_title">Альбом</string>
+    <string name="box_title">Коробка из-под обуви</string>
+    <string name="album_empty">Альбом пока пуст</string>
+    <string name="album_empty_text">Отмечайте лучшие отпечатки сердечком — они попадут сюда, по два на страницу.</string>
+    <string name="box_empty">Коробка пока пуста</string>
+    <string name="box_empty_text">Сюда попадают отпечатки из каждого конверта.</string>
+    <string name="shelf_title">Полка</string>
+    <string name="shelf_empty">На полке пока пусто</string>
+    <string name="shelf_empty_text">Здесь хранятся проявленные плёнки, с контактными листами и негативами.</string>
+    <string name="contact_sheet">Контактный лист</string>
+    <string name="negatives">Негативы</string>
+    <string name="roll_was_expired">просроченная плёнка</string>
+    <string name="roll_delete">Выбросить плёнку</string>
+    <string name="roll_delete_text">Её отпечатки, негативы и оригиналы камеры будут удалены навсегда.</string>
+    <string name="roll_delete_do">Выбросить</string>
+
+    <!-- Film -->
+    <string name="film_watch">Смотреть фильм</string>
+    <string name="film_play">Смотреть</string>
+    <string name="film_sound">Звук проектора</string>
+    <string name="film_default_title">Домашнее кино</string>
+    <string name="film_end">Конец</string>
+
+    <!-- Settings -->
+    <string name="settings_title">Настройки</string>
+    <string name="set_shooting">Съёмка</string>
+    <string name="set_hide">Прятать снимки из галереи</string>
+    <string name="set_hide_hint">Попав на плёнку, снимки камеры уходят в корзину галереи, чтобы никто не подглядывал. Телефон каждый раз спросит один раз.</string>
+    <string name="set_hide_old">Нужен Android 11 или новее; здесь снимки останутся в галерее.</string>
+    <string name="set_stamp">Дата на снимках</string>
+    <string name="set_stamp_hint">Оранжевая дата в углу, как у старой мыльницы.</string>
+    <string name="set_keeper">Ваше имя</string>
+    <string name="set_keeper_hint">Пишется на обороте отпечатков как автор снимка.</string>
+    <string name="set_keeper_placeholder">Мама</string>
+    <string name="set_notify_section">Уведомления</string>
+    <string name="set_notify">Когда конверт готов</string>
+    <string name="set_notify_hint">Одно тихое уведомление на заказ. Больше ничего.</string>
+    <string name="set_language">Язык</string>
+    <string name="lang_system">Как в системе</string>
+    <string name="set_backup">Резервная копия</string>
+    <string name="set_backup_hint">Всё хранится только на этом телефоне. Резервная копия — один zip со всеми плёнками, отпечатками и фильмами.</string>
+    <string name="backup_export">Экспорт</string>
+    <string name="backup_export_hint">Сохранить Silverbox.zip куда угодно</string>
+    <string name="backup_import">Импорт</string>
+    <string name="backup_import_hint">Заменить всё резервной копией</string>
+    <string name="backup_import_confirm">Всё, что сейчас есть в Silverbox, будет заменено резервной копией.</string>
+    <string name="backup_import_do">Заменить</string>
+    <string name="backup_done">Резервная копия сохранена.</string>
+    <string name="backup_failed">Не удалось сохранить резервную копию.</string>
+    <string name="backup_restored">Резервная копия восстановлена.</string>
+    <string name="backup_bad">Это не резервная копия Silverbox.</string>
+    <string name="about">Silverbox %s · часть Stillcraft · без рекламы и аккаунтов</string>
+
+    <!-- Onboarding -->
+    <string name="onb1_title">Снимай сейчас —\nсмотри завтра.</string>
+    <string name="onb1_text">Silverbox — плёночный фотоаппарат для семьи. Вы снимаете обычной камерой телефона, снимки попадают на плёнку, и вы не увидите их, пока плёнку не проявят. Меньше фотографий — больше моментов.</string>
+    <string name="onb2_title">Путь одной плёнки</string>
+    <string name="onb2_s1">Зарядите плёнку: 24 или 36 кадров с нужным характером</string>
+    <string name="onb2_s2">Снимайте камерой телефона, в любом её режиме</string>
+    <string name="onb2_s3">Когда плёнка кончится, сдайте её в фотоателье</string>
+    <string name="onb2_s4">Через сутки откройте конверт с отпечатками</string>
+    <string name="onb3_title">Одно разрешение</string>
+    <string name="onb3_text">Чтобы снимки камеры попадали на плёнку, Silverbox должен видеть ваши фото и видео. С телефона ничего не уходит.</string>
+    <string name="onb3_allow">Разрешить доступ</string>
+    <string name="onb3_allowed">Доступ есть. Всё готово.</string>
+    <string name="onb_start">Зарядить первую плёнку</string>
+
+    <!-- Notices -->
+    <string name="channel_lab">Фотоателье</string>
+    <string name="channel_lab_desc">Когда конверт готов</string>
+    <string name="notif_title">Ваши фотографии готовы</string>
+    <string name="notif_prints">Заказ №%04d ждёт вас в конверте.</string>
+    <string name="notif_film">Фильм, заказ №%04d, готов к просмотру.</string>
+    <plurals name="notif_many">
+        <item quantity="one">Ждёт %d конверт.</item>
+        <item quantity="few">Ждут %d конверта.</item>
+        <item quantity="many">Ждут %d конвертов.</item>
+        <item quantity="other">Ждут %d конверта.</item>
+    </plurals>
+
+    <string-array name="prompts">
+        <item>Руки, которые готовят</item>
+        <item>Кто-то спит</item>
+        <item>Вид из окна этим утром</item>
+        <item>Обычный ужин</item>
+        <item>Обувь у двери</item>
+        <item>Кто-то смеётся и не смотрит в камеру</item>
+        <item>Руки бабушки или дедушки</item>
+        <item>Стол после ужина</item>
+        <item>Ваша улица сегодня</item>
+        <item>Рисунок на холодильнике</item>
+        <item>Кто-то читает</item>
+        <item>Закатный свет на стене</item>
+        <item>Любимое место питомца</item>
+        <item>Все вместе, пусть и смазано</item>
+        <item>Подоконник на кухне</item>
+        <item>Дорога домой</item>
+        <item>Любимый человек крупным планом</item>
+        <item>Утренний кофе или чай</item>
+        <item>Беспорядок, по которому однажды соскучитесь</item>
+        <item>Самая старая вещь в доме</item>
+        <item>Ноги на пледе</item>
+        <item>Ваша собственная тень</item>
+        <item>Дождь или снег на стекле</item>
+        <item>Объятие</item>
+    </string-array>
+</resources>
