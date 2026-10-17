@@ -103,6 +103,23 @@ object DemoSeed {
                 )
             }
         }
+        // A summer cassette already on the shelf (the lab cuts it on first start), and one in the camera.
+        val reel = dao.insert(
+            Roll(
+                format = Format.MOVIE.name, stock = Stock.HOME8.name, capacity = Rules.CASSETTE, name = if (ru) "Лето у бабушки" else "Summer at Gran's",
+                loadedAt = at(today.minusDays(110), 9, 0), sentAt = at(today.minusDays(95), 18, 0), readyAt = at(today.minusDays(94), 18, 0),
+                order = order++, opened = true,
+            )
+        )
+        listOf("clip_bruno", "clip_rain", "clip_bruno").forEachIndexed { i, clip ->
+            val tmp = File(context.cacheDir, "demo-reel-$i.mp4")
+            val ok = runCatching { open("demo/$clip.mp4").use { a -> tmp.outputStream().use { a.copyTo(it) } } }.isSuccess
+            if (!ok) return@forEachIndexed
+            val name = tmp.inputStream().use { c.vault.take(it, "mp4") }
+            tmp.delete()
+            val d = c.vault.durationMs(c.vault.file(name))
+            dao.insert(Frame(rollId = reel, number = i + 1, original = name, video = true, durationMs = d, clipStartMs = Rules.clipStart(d) + i * 300L, takenAt = at(today.minusDays(108L - i * 4), 11, 0)))
+        }
         // A cassette in the camera with two clips on it.
         val cassette = dao.insert(Roll(format = Format.MOVIE.name, stock = Stock.HOME8.name, capacity = Rules.CASSETTE, name = if (ru) "Наша осень" else "Our autumn", loadedAt = at(today.minusDays(9), 10, 0)))
         listOf("clip_bruno", "clip_rain").forEachIndexed { i, clip ->
