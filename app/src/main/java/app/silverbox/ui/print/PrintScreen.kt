@@ -6,6 +6,7 @@ import android.graphics.Bitmap
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -26,6 +27,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.RotateRight
+import androidx.compose.material.icons.rounded.PhotoCamera
 import androidx.compose.material.icons.rounded.Share
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -41,6 +43,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -86,9 +89,11 @@ fun PrintScreen(id: Long, scope: Scope, data: LabData, go: Go) {
     val start = list.indexOfFirst { it.id == id }.coerceAtLeast(0)
     val pager = rememberPagerState(initialPage = start) { list.size }
     var back by rememberSaveable { mutableStateOf(false) }
-    LaunchedEffect(pager.currentPage) { back = false }
+    var original by rememberSaveable { mutableStateOf(false) }
+    LaunchedEffect(pager.currentPage) { back = false; original = false }
     val current = list.getOrNull(pager.currentPage) ?: list[0]
     val roll = data.roll(current.rollId)
+    val canOriginal = data.settings.originals && !current.video
     val coroutines = androidx.compose.runtime.rememberCoroutineScope()
 
     Column(Modifier.fillMaxSize().background(U.c.bg).statusBarsPadding().navigationBarsPadding()) {
@@ -98,7 +103,7 @@ fun PrintScreen(id: Long, scope: Scope, data: LabData, go: Go) {
         HorizontalPager(pager, Modifier.weight(1f).fillMaxWidth(), beyondViewportPageCount = 1) { page ->
             val f = list[page]
             Box(Modifier.fillMaxSize().padding(22.dp), contentAlignment = Alignment.Center) {
-                Turnable(f, back && page == pager.currentPage, data) { back = !back }
+                Turnable(f, back && page == pager.currentPage, original && page == pager.currentPage && canOriginal, data) { back = !back }
             }
         }
         Column(Modifier.fillMaxWidth().padding(horizontal = 20.dp, vertical = 10.dp)) {
@@ -117,16 +122,24 @@ fun PrintScreen(id: Long, scope: Scope, data: LabData, go: Go) {
                     Spacer(Modifier.width(6.dp))
                     Text(stringResource(if (back) R.string.print_front else R.string.print_back), style = UType.Button.copy(color = U.c.teal))
                 }
+                if (canOriginal) Row(
+                    Modifier.clickable { original = !original; back = false }.padding(horizontal = 12.dp, vertical = 12.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Icon(Icons.Rounded.PhotoCamera, null, tint = U.c.teal)
+                    Spacer(Modifier.width(6.dp))
+                    Text(stringResource(if (original) R.string.print_developed else R.string.print_original), style = UType.Button.copy(color = U.c.teal))
+                }
             }
         }
     }
 }
 
-/** The print, turning over in 3D to its back. */
+/** The print, turning over in 3D to its back; or, when asked, the camera's own picture, whole and without the paper. */
 @Composable
-private fun Turnable(f: Frame, back: Boolean, data: LabData, onTap: () -> Unit) {
+private fun Turnable(f: Frame, back: Boolean, original: Boolean, data: LabData, onTap: () -> Unit) {
     val angle by animateFloatAsState(if (back) 180f else 0f, tween(520), label = "turn")
-    val bmp = rememberFull(f.print)
+    val bmp = rememberFull(if (original) f.original else f.print)
     val landscape = bmp?.let { it.width >= it.height } ?: true
     Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
         val m = Modifier
@@ -135,7 +148,11 @@ private fun Turnable(f: Frame, back: Boolean, data: LabData, onTap: () -> Unit) 
                 rotationY = angle
                 cameraDistance = 14 * density
             }
-        if (angle <= 90f) Print(bmp, m.clickable(onClick = onTap), landscape = landscape, border = 10.dp)
+        if (original && bmp != null && angle <= 90f) Image(
+            bmp.asImageBitmap(), null,
+            m.aspectRatio(bmp.width.toFloat() / bmp.height).shadow(5.dp, RoundedCornerShape(2.dp)).clickable(onClick = onTap),
+        )
+        else if (angle <= 90f) Print(bmp, m.clickable(onClick = onTap), landscape = landscape, border = 10.dp)
         else Back(f, data, landscape, m.graphicsLayer { rotationY = 180f }, onTap)
     }
 }

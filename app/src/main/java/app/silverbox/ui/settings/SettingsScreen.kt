@@ -19,6 +19,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Download
+import androidx.compose.material.icons.rounded.PhotoLibrary
 import androidx.compose.material.icons.rounded.Upload
 import androidx.compose.material.icons.rounded.WbSunny
 import androidx.compose.material.icons.rounded.Bedtime
@@ -37,6 +38,7 @@ import app.silverbox.BuildConfig
 import app.silverbox.R
 import app.silverbox.container
 import app.silverbox.data.Backup
+import app.silverbox.data.Gallery
 import app.silverbox.data.Settings
 import app.silverbox.domain.Reminders
 import app.silverbox.ui.Go
@@ -66,6 +68,8 @@ fun SettingsScreen(data: LabData, go: Go) {
     var status by remember { mutableStateOf<String?>(null) }
     var restoreUri by remember { mutableStateOf<android.net.Uri?>(null) }
     var timeFor by remember { mutableStateOf(0) }
+    var returning by remember { mutableStateOf(false) }
+    var galleryStatus by remember { mutableStateOf<String?>(null) }
     fun set(change: (Settings) -> Settings) = c.write { settings.update(change) }
 
     val export = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("application/zip")) { uri ->
@@ -74,6 +78,19 @@ fun SettingsScreen(data: LabData, go: Go) {
             val ok = runCatching { withContext(Dispatchers.IO) { Backup.write(context, uri, c.db.dao().rolls(), c.db.dao().frames(), c.vault) } }.isSuccess
             status = context.getString(if (ok) R.string.backup_done else R.string.backup_failed)
         }
+    }
+    fun giveBack() {
+        c.scope.launch {
+            val n = runCatching { withContext(Dispatchers.IO) { Gallery.restore(context, c.db.dao().rolls(), c.db.dao().frames(), c.vault) } }.getOrNull()
+            galleryStatus = when {
+                n == null -> context.getString(R.string.gallery_failed)
+                n == 0 -> context.getString(R.string.gallery_none)
+                else -> context.resources.getQuantityString(R.plurals.gallery_done, n, n)
+            }
+        }
+    }
+    val askWrite = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
+        if (granted) giveBack() else galleryStatus = context.getString(R.string.gallery_failed)
     }
     val import = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri -> restoreUri = uri }
 
@@ -123,6 +140,13 @@ fun SettingsScreen(data: LabData, go: Go) {
                 }
             }
 
+            SectionTitle(stringResource(R.string.set_originals))
+            UCard {
+                SwitchRow(stringResource(R.string.set_originals_show), stringResource(R.string.set_originals_show_hint), s.originals, { on -> set { it.copy(originals = on) } })
+                InfoRow(Icons.Rounded.PhotoLibrary, stringResource(R.string.gallery_return), stringResource(R.string.gallery_return_hint), onClick = { returning = true })
+                galleryStatus?.let { Text(it, style = UType.Muted.copy(color = U.c.teal)) }
+            }
+
             SectionTitle(stringResource(R.string.set_backup))
             UCard {
                 Text(stringResource(R.string.set_backup_hint), style = UType.Muted)
@@ -146,6 +170,16 @@ fun SettingsScreen(data: LabData, go: Go) {
             if (timeFor == 1) set { it.copy(remindFrom = m.coerceAtMost(it.remindTo - 60)) }
             else set { it.copy(remindTo = m.coerceAtLeast(it.remindFrom + 60)) }
         }
+    }
+
+    if (returning) {
+        ConfirmDialog(
+            stringResource(R.string.gallery_return), stringResource(R.string.gallery_return_confirm), stringResource(R.string.gallery_return_do),
+            onConfirm = {
+                if (Gallery.needsPermission(context)) askWrite.launch(android.Manifest.permission.WRITE_EXTERNAL_STORAGE) else giveBack()
+            },
+            onDismiss = { returning = false },
+        )
     }
 
     restoreUri?.let { uri ->

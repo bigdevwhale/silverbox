@@ -33,6 +33,8 @@ data class Settings(
     /** The window they come in, minutes after midnight. */
     val remindFrom: Int = 10 * 60,
     val remindTo: Int = 20 * 60,
+    /** A developed print can be turned to the picture the camera took, before the lab. */
+    val originals: Boolean = false,
 )
 
 class SettingsStore(context: Context) {
@@ -51,6 +53,7 @@ class SettingsStore(context: Context) {
         reminders = this[REMINDERS] ?: 2,
         remindFrom = this[REMIND_FROM] ?: 10 * 60,
         remindTo = this[REMIND_TO] ?: 20 * 60,
+        originals = this[ORIGINALS] ?: false,
     )
 
     suspend fun now(): Settings = settings.first()
@@ -68,6 +71,7 @@ class SettingsStore(context: Context) {
             it[REMINDERS] = s.reminders
             it[REMIND_FROM] = s.remindFrom
             it[REMIND_TO] = s.remindTo
+            it[ORIGINALS] = s.originals
         }
     }
 
@@ -82,5 +86,6 @@ class SettingsStore(context: Context) {
         val REMINDERS = intPreferencesKey("reminders")
         val REMIND_FROM = intPreferencesKey("remind_from")
         val REMIND_TO = intPreferencesKey("remind_to")
+        val ORIGINALS = booleanPreferencesKey("originals")
     }
 }

@@ -212,6 +212,21 @@
     <string name="set_notify_hint">One quiet notice per order. Nothing else.</string>
     <string name="set_language">Language</string>
     <string name="lang_system">System</string>
+    <string name="set_originals">Originals</string>
+    <string name="set_originals_show">Show originals</string>
+    <string name="set_originals_show_hint">A developed print gets an Original button: the frame as the camera took it, before the lab.</string>
+    <string name="gallery_return">Back to the gallery</string>
+    <string name="gallery_return_hint">Originals of developed rolls go to Pictures/Silverbox</string>
+    <string name="gallery_return_confirm">The camera\'s originals from every developed roll and cassette will be copied to the phone\'s gallery, in the Pictures/Silverbox folder. The prints stay here as they are.</string>
+    <string name="gallery_return_do">Copy</string>
+    <string name="gallery_none">Everything developed is already in the gallery.</string>
+    <string name="gallery_failed">Couldn\'t write to the gallery.</string>
+    <plurals name="gallery_done">
+        <item quantity="one">%d original is back in the gallery.</item>
+        <item quantity="other">%d originals are back in the gallery.</item>
+    </plurals>
+    <string name="print_original">Original</string>
+    <string name="print_developed">Print</string>
     <string name="set_backup">Backup</string>
     <string name="set_backup_hint">Everything is kept on this phone only. A backup is one zip with every roll, print and film.</string>
     <string name="backup_export">Export</string>

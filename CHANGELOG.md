@@ -1,5 +1,10 @@
 # Changelog
 
+## [1.2.0]
+
+- Settings → Originals: a developed print can be turned to the picture the camera took, whole and before the lab.
+- "Back to the gallery" copies the originals of developed rolls and cassettes, untouched, into Pictures/Silverbox, on the day they were taken; a second run skips what is already there.
+
 ## [1.1.0]
 
 - Reminders to take a picture, 1 to 5 a day (or off) inside a window you choose, each with something worth a frame and a "Shoot" button that opens the camera. Quiet if you shot something in the last hour and a half.

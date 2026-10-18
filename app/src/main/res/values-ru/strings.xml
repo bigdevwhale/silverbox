@@ -235,6 +235,23 @@
     <string name="set_notify_hint">Одно тихое уведомление на заказ. Больше ничего.</string>
     <string name="set_language">Язык</string>
     <string name="lang_system">Как в системе</string>
+    <string name="set_originals">Оригиналы</string>
+    <string name="set_originals_show">Показывать оригиналы</string>
+    <string name="set_originals_show_hint">У проявленного отпечатка появится кнопка «Оригинал»: кадр таким, каким его сняла камера, до лаборатории.</string>
+    <string name="gallery_return">Вернуть в галерею</string>
+    <string name="gallery_return_hint">Оригиналы проявленных плёнок — в папку Pictures/Silverbox</string>
+    <string name="gallery_return_confirm">Оригиналы камеры со всех проявленных плёнок и кассет скопируются в галерею телефона, в папку Pictures/Silverbox. Отпечатки здесь останутся как есть.</string>
+    <string name="gallery_return_do">Скопировать</string>
+    <string name="gallery_none">Всё проявленное уже в галерее.</string>
+    <string name="gallery_failed">Не получилось записать в галерею.</string>
+    <plurals name="gallery_done">
+        <item quantity="one">%d оригинал вернулся в галерею.</item>
+        <item quantity="few">%d оригинала вернулись в галерею.</item>
+        <item quantity="many">%d оригиналов вернулись в галерею.</item>
+        <item quantity="other">%d оригинала вернулись в галерею.</item>
+    </plurals>
+    <string name="print_original">Оригинал</string>
+    <string name="print_developed">Отпечаток</string>
     <string name="set_backup">Резервная копия</string>
     <string name="set_backup_hint">Всё хранится только на этом телефоне. Резервная копия — один zip со всеми плёнками, отпечатками и фильмами.</string>
     <string name="backup_export">Экспорт</string>
