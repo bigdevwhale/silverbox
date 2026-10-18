@@ -117,11 +117,10 @@ class LabData(val rolls: List<Roll>, val frames: List<Frame>, val settings: Sett
     /** The prints chosen for the album, oldest first, the way an album fills. */
     val album: List<Frame> = box.filter { it.album }.sortedBy { it.takenAt }
     val yearsAgo: List<Frame> = app.silverbox.domain.Rules.yearsAgo(box, today, zone)
-    val shooting: Boolean get() = settings.shootingSince > 0 && now - settings.shootingSince < Pickup.SESSION
 }
 
 /** Everything a screen can open. */
-class Go(private val nav: NavHostController, val shoot: () -> Unit, val stopShooting: () -> Unit) {
+class Go(private val nav: NavHostController, val shoot: () -> Unit) {
     fun load(format: Format) = nav.navigate("load/${format.name}") { launchSingleTop = true }
     fun send(id: Long) = nav.navigate("send/$id") { launchSingleTop = true }
     fun envelope(id: Long) = nav.navigate("envelope/$id") { launchSingleTop = true }
@@ -166,24 +165,30 @@ fun SilverboxRoot(settings: Settings, shootRequests: Int = 0) {
                 if (!Pickup.canRead(context)) askRead.launch(Pickup.permissions())
                 else startShooting(context)
             },
-            stopShooting = { container.write { this.settings.update { it.copy(shootingSince = 0) } } },
         )
     }
 
-    // Back from the camera: whatever it took goes onto the film. Pending clips may land a moment later.
+    // Back from the camera: what it took on this one trip goes onto the film, and the trip is over.
+    // Anything shot later with the camera on its own stays the keeper's and is never touched.
     LifecycleEventEffect(Lifecycle.Event.ON_RESUME) {
         scope.launch {
             val s = container.settings.now()
-            if (s.shootingSince <= 0 || !Pickup.canRead(context)) return@launch
+            if (s.shootingSince <= 0) return@launch
+            val since = s.shootingSince
+            // A resume in the instant the camera is being opened (after the permission dialog) is not a return.
+            if (System.currentTimeMillis() - since < 2000) return@launch
+            val until = minOf(System.currentTimeMillis(), since + Pickup.SESSION)
+            container.settings.update { it.copy(shootingSince = 0) }
+            if (!Pickup.canRead(context)) return@launch
             val got = mutableListOf<Pickup.Loaded>()
+            // A clip the camera is still finishing may land a moment later.
             for (wait in listOf(0L, 1500L)) {
                 delay(wait)
-                got += Pickup.load(context, container.db, container.vault, s.shootingSince)
+                got += Pickup.load(context, container.db, container.vault, since, until)
             }
             val uris = got.flatMap { it.uris }
             val sum = Pickup.Loaded(uris, got.sumOf { it.photos }, got.sumOf { it.clips }, got.sumOf { it.leftover }, got.sumOf { it.noRoll })
             if (sum.photos + sum.clips + sum.leftover + sum.noRoll > 0) loaded = sum
-            if (System.currentTimeMillis() - s.shootingSince > Pickup.SESSION) container.settings.update { it.copy(shootingSince = 0) }
             if (s.hide && uris.isNotEmpty()) {
                 Pickup.trashRequest(context, uris)?.let { trash.launch(IntentSenderRequest.Builder(it.intentSender).build()) }
             }
@@ -269,11 +274,7 @@ private fun startShooting(context: android.content.Context) {
     }
     val c = context.container
     c.scope.launch {
-        c.settings.update { s ->
-            // Keep the session that is already running, so going back and forth loses nothing.
-            val now = System.currentTimeMillis()
-            s.copy(shootingSince = if (s.shootingSince > 0 && now - s.shootingSince < Pickup.SESSION) s.shootingSince else now)
-        }
+        c.settings.update { it.copy(shootingSince = System.currentTimeMillis()) }
         runCatching { context.startActivity(Pickup.cameraIntent()) }
     }
 }

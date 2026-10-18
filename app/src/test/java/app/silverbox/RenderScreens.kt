@@ -76,7 +76,7 @@ class RenderScreens {
         }
         rule.setContent {
             val s: Settings? by app.container.settings.settings.collectAsState(initial = null)
-            SilverboxTheme { s?.let { SilverboxRoot(it) } }
+            SilverboxTheme(dark = System.getProperty("render.dark") == "true") { s?.let { SilverboxRoot(it) } }
         }
         settle(5000)
         shot("1-camera")

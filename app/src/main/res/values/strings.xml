@@ -56,10 +56,6 @@
     <string name="ready_open_film">Collect the film</string>
     <string name="order_line">Order №%1$s · %2$s</string>
 
-    <string name="shooting_title">Shooting</string>
-    <string name="shooting_text">Whatever your camera takes now goes on the film. Come back here when you\'re done.</string>
-    <string name="shooting_back">Back to the camera</string>
-    <string name="shooting_done">Finish</string>
     <plurals name="loaded_photos">
         <item quantity="one">%d frame went on the film</item>
         <item quantity="other">%d frames went on the film</item>
@@ -210,6 +206,10 @@
     <string name="set_notify_section">Notices</string>
     <string name="set_notify">When the envelope is ready</string>
     <string name="set_notify_hint">One quiet notice per order. Nothing else.</string>
+    <string name="set_appearance">Appearance</string>
+    <string name="appearance_system">As the system</string>
+    <string name="appearance_light">Photo shop</string>
+    <string name="appearance_dark">Darkroom</string>
     <string name="set_language">Language</string>
     <string name="lang_system">System</string>
     <string name="set_originals">Originals</string>

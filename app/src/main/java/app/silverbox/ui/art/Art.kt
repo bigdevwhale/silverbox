@@ -1,5 +1,6 @@
 package app.silverbox.ui.art
 
+import app.silverbox.ui.theme.Paper
 import android.graphics.Bitmap
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
@@ -31,6 +32,7 @@ import androidx.compose.ui.graphics.ColorMatrix
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.drawscope.DrawScope
+import androidx.compose.ui.graphics.drawscope.clipPath
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.rotate
 import androidx.compose.ui.layout.ContentScale
@@ -155,12 +157,16 @@ fun DrawScope.canister(stock: Stock) {
         lineTo(bodyR - w * 0.02f, bot - h * 0.12f)
         close()
     }
-    drawPath(leader, Color(0xFF3A2416))
-    // Perforations along the leader.
-    for (i in 0 until 5) {
-        val x = bodyR + w * 0.03f + i * w * 0.055f
-        drawRoundRect(Color(0xFF1A0F09), Offset(x, top + h * 0.215f), Size(w * 0.03f, h * 0.045f), CornerRadius(2f))
-        drawRoundRect(Color(0xFF1A0F09), Offset(x, bot - h * 0.2f), Size(w * 0.03f, h * 0.045f), CornerRadius(2f))
+    // The amber-brown of a film base, light enough to read on the dark theme too.
+    drawPath(leader, Brush.verticalGradient(listOf(Color(0xFF9A6236), Color(0xFF7A4724), Color(0xFF8C5530)), top, bot))
+    drawPath(leader, Color(0xFFC08A55), style = Stroke(w * 0.006f))
+    // Perforations along the leader, kept inside its curled edge.
+    clipPath(leader) {
+        for (i in 0 until 4) {
+            val x = bodyR + w * 0.03f + i * w * 0.055f
+            drawRoundRect(Color(0xFF2A1509), Offset(x, top + h * 0.235f), Size(w * 0.03f, h * 0.045f), CornerRadius(2f))
+            drawRoundRect(Color(0xFF2A1509), Offset(x, bot - h * 0.235f), Size(w * 0.03f, h * 0.045f), CornerRadius(2f))
+        }
     }
     // Spool ends.
     val metal = Brush.verticalGradient(listOf(Color(0xFFE6E2DA), Color(0xFF9C978E), Color(0xFFD6D1C8), Color(0xFF7E796F)), top, bot)
@@ -305,7 +311,7 @@ fun Print(bitmap: Bitmap?, modifier: Modifier = Modifier, landscape: Boolean = b
         modifier
             .aspectRatio(if (landscape) 1.5f else 1 / 1.5f)
             .shadow(5.dp, RoundedCornerShape(2.dp))
-            .background(U.c.paper)
+            .background(Paper.white)
             .padding(border),
     ) {
         if (bitmap != null) {

@@ -89,7 +89,7 @@ fun SectionTitle(text: String, modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun PrimaryButton(text: String, onClick: () -> Unit, modifier: Modifier = Modifier, enabled: Boolean = true, color: Color = U.c.teal, icon: ImageVector? = null, content: Color = U.c.paper) {
+fun PrimaryButton(text: String, onClick: () -> Unit, modifier: Modifier = Modifier, enabled: Boolean = true, color: Color = U.c.teal, icon: ImageVector? = null, content: Color = U.c.onTeal) {
     Button(
         onClick = onClick,
         enabled = enabled,

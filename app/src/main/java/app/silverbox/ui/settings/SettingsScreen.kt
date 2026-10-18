@@ -39,6 +39,7 @@ import app.silverbox.R
 import app.silverbox.container
 import app.silverbox.data.Backup
 import app.silverbox.data.Gallery
+import app.silverbox.data.Appearance
 import app.silverbox.data.Settings
 import app.silverbox.domain.Reminders
 import app.silverbox.ui.Go
@@ -127,6 +128,15 @@ fun SettingsScreen(data: LabData, go: Go) {
                 if (s.reminders > 0) {
                     InfoRow(Icons.Rounded.WbSunny, stringResource(R.string.set_remind_from), hm(s.remindFrom), onClick = { timeFor = 1 })
                     InfoRow(Icons.Rounded.Bedtime, stringResource(R.string.set_remind_to), hm(s.remindTo), onClick = { timeFor = 2 })
+                }
+            }
+
+            SectionTitle(stringResource(R.string.set_appearance))
+            UCard {
+                Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Chip(stringResource(R.string.appearance_system), s.appearance == Appearance.SYSTEM, { set { it.copy(appearance = Appearance.SYSTEM) } })
+                    Chip(stringResource(R.string.appearance_light), s.appearance == Appearance.LIGHT, { set { it.copy(appearance = Appearance.LIGHT) } })
+                    Chip(stringResource(R.string.appearance_dark), s.appearance == Appearance.DARK, { set { it.copy(appearance = Appearance.DARK) } })
                 }
             }
 

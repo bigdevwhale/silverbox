@@ -100,7 +100,7 @@ private fun Album(list: List<Frame>, go: Go) {
                 Modifier
                     .fillMaxWidth()
                     .clip(U.RSm)
-                    .background(Color(0xFFF7F0E1))
+                    .background(U.c.albumPage)
                     .border(1.dp, U.c.line, U.RSm)
                     .padding(horizontal = 22.dp, vertical = 20.dp),
                 verticalArrangement = Arrangement.spacedBy(18.dp),
@@ -124,7 +124,7 @@ private fun Mounted(f: Frame, align: Alignment.Horizontal, onClick: () -> Unit) 
         }
         Spacer(Modifier.height(6.dp))
         Text(
-            f.note.ifBlank { T.date(c, f.takenAt) }, fontFamily = Hand, fontSize = 21.sp, lineHeight = 23.sp, color = Color(0xFF2B3A67),
+            f.note.ifBlank { T.date(c, f.takenAt) }, fontFamily = Hand, fontSize = 21.sp, lineHeight = 23.sp, color = U.c.albumInk,
             maxLines = 2, modifier = Modifier.fillMaxWidth(if (landscape) 0.92f else 0.62f),
         )
     }
@@ -133,10 +133,10 @@ private fun Mounted(f: Frame, align: Alignment.Horizontal, onClick: () -> Unit) 
 /** The four black paper corners that hold a print in an album. */
 @Composable
 private fun Corners(modifier: Modifier) {
+    val ink = U.c.corners
     Canvas(modifier) {
         val s = size.minDimension * 0.11f
         val o = -s * 0.22f
-        val ink = Color(0xFF221D19)
         fun corner(x: Float, y: Float, dx: Float, dy: Float) {
             drawPath(Path().apply { moveTo(x, y); lineTo(x + dx * s, y); lineTo(x, y + dy * s); close() }, ink)
         }

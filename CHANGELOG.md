@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.0]
+
+- Dark theme, the darkroom: warm near-black, black album pages with white-pen captions; prints and the lab's labels stay paper. Settings → Appearance: as the system, photo shop or darkroom.
+- One tap on Shoot is one trip to the camera: what it took goes on the film when you come back, and the trip ends there. Pictures taken later with the camera on its own are never loaded or moved to the bin.
+- Picking a film no longer flashes a grey box behind it.
+- The film's tongue on the cartridge is lighter, so it reads on the dark theme, and its holes stay inside it.
+
 ## [1.2.0]
 
 - Settings → Originals: a developed print can be turned to the picture the camera took, whole and before the lab.

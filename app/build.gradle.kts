@@ -131,5 +131,6 @@ tasks.withType<Test>().configureEach {
     systemProperty("render.out", layout.buildDirectory.dir("art").get().asFile.absolutePath)
     systemProperty("render.res", file("src/main/res").absolutePath)
     systemProperty("render.docs", rootProject.file("docs").absolutePath)
+    systemProperty("render.dark", (findProperty("dark") != null).toString())
     systemProperty("render.photos", (findProperty("photos") as String?) ?: file("src/demo/assets/demo").absolutePath)
 }

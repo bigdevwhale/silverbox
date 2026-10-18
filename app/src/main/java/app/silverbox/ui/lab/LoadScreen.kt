@@ -4,6 +4,7 @@ import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -29,6 +30,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.res.stringResource
@@ -78,7 +80,15 @@ fun LoadScreen(format: Format, data: LabData, go: Go) {
                 items(stocks) { s ->
                     val on = s == stock
                     val k by animateFloatAsState(if (on) 1f else 0.9f, label = "pick")
-                    Box(Modifier.width(118.dp).scale(k).clickable { stock = s }.padding(vertical = 8.dp)) {
+                    // No ripple: the box itself grows and brightens when picked.
+                    Box(
+                        Modifier
+                            .width(118.dp)
+                            .scale(k)
+                            .alpha(if (on) 1f else 0.7f)
+                            .clickable(remember { MutableInteractionSource() }, indication = null) { stock = s }
+                            .padding(vertical = 8.dp),
+                    ) {
                         FilmBox(s, if (format == Format.PHOTO) size else 0, Modifier.fillMaxWidth())
                     }
                 }

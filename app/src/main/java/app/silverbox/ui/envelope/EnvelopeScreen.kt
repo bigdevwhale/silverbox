@@ -1,5 +1,6 @@
 package app.silverbox.ui.envelope
 
+import app.silverbox.ui.theme.Paper
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
@@ -109,11 +110,11 @@ private fun Closed(roll: Roll, data: LabData, flap: Float, onOpen: () -> Unit) {
             // The lab's label on the front pocket.
             Box(Modifier.fillMaxSize(), contentAlignment = Alignment.BottomCenter) {
                 Column(
-                    Modifier.padding(bottom = 22.dp).fillMaxWidth(0.62f).background(U.c.paper.copy(alpha = 0.92f)).padding(horizontal = 12.dp, vertical = 8.dp),
+                    Modifier.padding(bottom = 22.dp).fillMaxWidth(0.62f).background(Paper.white.copy(alpha = 0.94f)).padding(horizontal = 12.dp, vertical = 8.dp),
                 ) {
-                    Text(stringResource(if (roll.movie) R.string.env_film else R.string.env_photos), fontFamily = Mono, fontSize = 15.sp, color = U.c.brick)
-                    Text("№ " + T.order(roll.order) + " · " + stockLabel(roll.stockOf), fontFamily = Mono, fontSize = 11.sp, color = U.c.ink)
-                    Text(T.rollName(c, roll), style = UType.Hand.copy(fontSize = 20.sp), maxLines = 1)
+                    Text(stringResource(if (roll.movie) R.string.env_film else R.string.env_photos), fontFamily = Mono, fontSize = 15.sp, color = Paper.stamp)
+                    Text("№ " + T.order(roll.order) + " · " + stockLabel(roll.stockOf), fontFamily = Mono, fontSize = 11.sp, color = Paper.ink)
+                    Text(T.rollName(c, roll), style = UType.Hand.copy(fontSize = 20.sp, color = Paper.pen), maxLines = 1)
                 }
             }
         }

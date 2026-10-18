@@ -44,6 +44,18 @@ data class Palette(
     val paper: Color,
     val film: Color,
     val danger: Color,
+    /** Text on teal buttons. */
+    val onTeal: Color,
+    /** The shop's sign: the "ready" card. */
+    val sign: Color,
+    val onSign: Color,
+    /** Ink written by hand on the page itself (not on a print). */
+    val handInk: Color,
+    /** Album pages, their captions and photo corners. */
+    val albumPage: Color,
+    val albumInk: Color,
+    val corners: Color,
+    val dark: Boolean,
 )
 
 val ShopPalette = Palette(
@@ -67,7 +79,56 @@ val ShopPalette = Palette(
     paper = Color(0xFFFCFAF4),
     film = Color(0xFF1B1714),
     danger = Color(0xFFB4492F),
+    onTeal = Color(0xFFFCFAF4),
+    sign = Color(0xFF1E5B5C),
+    onSign = Color(0xFFFCFAF4),
+    handInk = Color(0xFF2B3A67),
+    albumPage = Color(0xFFF7F0E1),
+    albumInk = Color(0xFF2B3A67),
+    corners = Color(0xFF221D19),
+    dark = false,
 )
+
+/** The darkroom: warm near-black, the lamp's amber, teal turned up so it still reads, black album pages. */
+val DarkroomPalette = Palette(
+    bg = Color(0xFF14110E),
+    surface = Color(0xFF1E1A16),
+    surface2 = Color(0xFF28221D),
+    line = Color(0xFF3A322A),
+    ink = Color(0xFFEFE6D6),
+    muted = Color(0xFFB3A795),
+    faint = Color(0xFF7E7366),
+    mustard = Color(0xFFE0AC45),
+    mustardSoft = Color(0xFF3A2E17),
+    onMustard = Color(0xFF1F1606),
+    teal = Color(0xFF72BDB3),
+    tealSoft = Color(0xFF1D3533),
+    brick = Color(0xFFE58566),
+    brickSoft = Color(0xFF3A2119),
+    stamp = Color(0xFFFF8F2A),
+    kraft = Color(0xFFB08E5F),
+    kraftDark = Color(0xFF8E6E44),
+    paper = Color(0xFF221D18),
+    film = Color(0xFF0B0908),
+    danger = Color(0xFFE58566),
+    onTeal = Color(0xFF0E1C1B),
+    sign = Color(0xFF1C4746),
+    onSign = Color(0xFFEFE6D6),
+    handInk = Color(0xFFB9C6EA),
+    albumPage = Color(0xFF181512),
+    albumInk = Color(0xFFE8E1D2),
+    corners = Color(0xFF4A4038),
+    dark = true,
+)
+
+/** Things that are paper in the real world (prints, the lab's labels) stay paper in the dark too. */
+object Paper {
+    val white = Color(0xFFFCFAF4)
+    val ink = Color(0xFF2A231D)
+    val faint = Color(0xFF9A8E80)
+    val pen = Color(0xFF2B3A67)
+    val stamp = Color(0xFFB4492F)
+}
 
 val LocalPalette = staticCompositionLocalOf { ShopPalette }
 
@@ -110,19 +171,20 @@ object UType {
     val Small: TextStyle @Composable get() = TextStyle(fontFamily = Nunito, fontWeight = FontWeight.SemiBold, fontSize = 12.sp, color = U.c.faint)
     val Mono: TextStyle @Composable get() = TextStyle(fontFamily = app.silverbox.ui.theme.Mono, fontSize = 13.sp, lineHeight = 18.sp, color = U.c.ink)
     val Counter: TextStyle @Composable get() = TextStyle(fontFamily = app.silverbox.ui.theme.Mono, fontSize = 30.sp, color = U.c.ink)
-    val Hand: TextStyle @Composable get() = TextStyle(fontFamily = app.silverbox.ui.theme.Hand, fontSize = 22.sp, lineHeight = 25.sp, color = Color(0xFF2B3A67))
+    val Hand: TextStyle @Composable get() = TextStyle(fontFamily = app.silverbox.ui.theme.Hand, fontSize = 22.sp, lineHeight = 25.sp, color = U.c.handInk)
     val Number: TextStyle @Composable get() = TextStyle(fontFamily = app.silverbox.ui.theme.Mono, fontSize = 24.sp, color = U.c.ink)
     val Button: TextStyle @Composable get() = TextStyle(fontFamily = Nunito, fontWeight = FontWeight.Bold, fontSize = 15.sp)
 }
 
 @Composable
-fun SilverboxTheme(content: @Composable () -> Unit) {
-    val p = ShopPalette
+fun SilverboxTheme(dark: Boolean = androidx.compose.foundation.isSystemInDarkTheme(), content: @Composable () -> Unit) {
+    val p = if (dark) DarkroomPalette else ShopPalette
+    val base = if (dark) androidx.compose.material3.darkColorScheme() else lightColorScheme()
     CompositionLocalProvider(LocalPalette provides p) {
         MaterialTheme(
-            colorScheme = lightColorScheme(
+            colorScheme = base.copy(
                 primary = p.teal,
-                onPrimary = p.paper,
+                onPrimary = p.onTeal,
                 primaryContainer = p.tealSoft,
                 onPrimaryContainer = p.ink,
                 secondary = p.mustard,

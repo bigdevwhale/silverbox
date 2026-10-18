@@ -94,7 +94,6 @@ fun CameraTab(data: LabData, go: Go, loaded: Pickup.Loaded?, dismissLoaded: () -
 
         loaded?.let { LoadedCard(it, dismissLoaded) }
 
-        if (data.shooting) ShootingCard(go)
 
         val roll = data.camera
         if (roll != null) RollCard(roll, data.framesOf(roll.id), data, go) else EmptyCamera(go)
@@ -141,20 +140,20 @@ private fun ReadyCard(r: Roll, data: LabData, go: Go) {
         Modifier
             .fillMaxWidth()
             .clip(U.RLg)
-            .background(U.c.teal)
+            .background(U.c.sign)
             .clickable { go.envelope(r.id) }
             .padding(18.dp),
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Column(Modifier.weight(1f)) {
-                Text(stringResource(R.string.ready_eyebrow).uppercase(), style = UType.Eyebrow.copy(color = U.c.mustardSoft))
+                Text(stringResource(R.string.ready_eyebrow).uppercase(), style = UType.Eyebrow.copy(color = if (U.c.dark) U.c.mustard else U.c.mustardSoft))
                 Spacer(Modifier.height(6.dp))
-                Text(stringResource(if (r.movie) R.string.ready_film else R.string.ready_prints), style = UType.Title.copy(color = U.c.paper))
+                Text(stringResource(if (r.movie) R.string.ready_film else R.string.ready_prints), style = UType.Title.copy(color = U.c.onSign))
                 Spacer(Modifier.height(4.dp))
                 Text(
                     stringResource(R.string.order_line, T.order(r.order), stockLabel(r.stockOf)) + " · " +
                         T.plural(c, if (r.movie) R.plurals.clips else R.plurals.frames, data.framesOf(r.id).size),
-                    style = UType.Mono.copy(color = U.c.tealSoft, fontSize = 12.sp),
+                    style = UType.Mono.copy(color = U.c.onSign.copy(alpha = 0.75f), fontSize = 12.sp),
                 )
             }
             Spacer(Modifier.width(10.dp))
@@ -184,25 +183,6 @@ private fun LoadedCard(l: Pickup.Loaded, dismiss: () -> Unit) {
     ) {
         Column(Modifier.weight(1f)) { lines.forEach { Text(it, style = UType.Body.copy(fontSize = 14.sp)) } }
         IconButton(onClick = dismiss) { Icon(Icons.Rounded.Close, stringResource(R.string.close), tint = U.c.muted) }
-    }
-}
-
-@Composable
-private fun ShootingCard(go: Go) {
-    Column(Modifier.fillMaxWidth().padding(bottom = 12.dp).clip(U.RMd).background(U.c.brickSoft).padding(16.dp)) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            val blink = rememberInfiniteTransition(label = "rec").animateFloat(0.25f, 1f, infiniteRepeatable(tween(700), RepeatMode.Reverse), label = "a")
-            Box(Modifier.size(10.dp).clip(CircleShape).background(U.c.brick.copy(alpha = blink.value)))
-            Spacer(Modifier.width(8.dp))
-            Text(stringResource(R.string.shooting_title), style = UType.Strong)
-        }
-        Spacer(Modifier.height(4.dp))
-        Text(stringResource(R.string.shooting_text), style = UType.Muted)
-        Spacer(Modifier.height(10.dp))
-        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            SoftButton(stringResource(R.string.shooting_back), { go.shoot() }, Modifier.weight(1f), color = U.c.brick, soft = U.c.surface, icon = Icons.Rounded.CameraAlt)
-            SoftButton(stringResource(R.string.shooting_done), { go.stopShooting() }, color = U.c.muted, soft = U.c.surface)
-        }
     }
 }
 

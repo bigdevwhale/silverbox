@@ -87,6 +87,8 @@ fun CinemaScreen(id: Long, data: LabData, go: Go) {
     }
     val clatter = remember { runCatching { MediaPlayer.create(c, R.raw.projector)?.apply { isLooping = true; setVolume(0.18f, 0.18f) } }.getOrNull() }
     val view = androidx.compose.ui.platform.LocalView.current
+    // What the bars go back to: dark icons on the cream theme, light ones in the darkroom.
+    val lightIcons = app.silverbox.ui.theme.U.c.dark
     DisposableEffect(player) {
         // The room is dark: light icons in the bars while the film is on.
         val window = (view.context as? android.app.Activity)?.window
@@ -94,8 +96,8 @@ fun CinemaScreen(id: Long, data: LabData, go: Go) {
         bars?.isAppearanceLightStatusBars = false
         bars?.isAppearanceLightNavigationBars = false
         onDispose {
-            bars?.isAppearanceLightStatusBars = true
-            bars?.isAppearanceLightNavigationBars = true
+            bars?.isAppearanceLightStatusBars = !lightIcons
+            bars?.isAppearanceLightNavigationBars = !lightIcons
             player.release()
             clatter?.release()
         }

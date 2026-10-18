@@ -1,5 +1,6 @@
 package app.silverbox.ui.print
 
+import app.silverbox.ui.theme.Paper
 import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
@@ -173,39 +174,39 @@ private fun Back(f: Frame, data: LabData, landscape: Boolean, modifier: Modifier
         modifier
             .aspectRatio(if (landscape) 1.5f else 1 / 1.5f)
             .shadow(5.dp, RoundedCornerShape(2.dp))
-            .background(U.c.paper)
+            .background(Paper.white)
             .padding(16.dp),
     ) {
         Row(Modifier.fillMaxWidth().clickable(onClick = onTap)) {
             Text(
                 "SILVERBOX LAB  №" + (roll?.let { T.order(it.order) } ?: "—") + "  " + T.stampDate(f.takenAt) + "  " + (roll?.let { stockLabel(it.stockOf).uppercase() } ?: ""),
-                fontFamily = Mono, fontSize = 9.sp, color = U.c.faint, maxLines = 1,
+                fontFamily = Mono, fontSize = 9.sp, color = Paper.faint, maxLines = 1,
             )
         }
         Spacer(Modifier.height(10.dp))
         BasicTextField(
             note, { note = it.take(240) },
             Modifier.fillMaxWidth().weight(1f),
-            textStyle = UType.Hand.copy(fontSize = 25.sp, lineHeight = 28.sp),
+            textStyle = UType.Hand.copy(fontSize = 25.sp, lineHeight = 28.sp, color = Paper.pen),
             cursorBrush = SolidColor(U.c.teal),
             decorationBox = { inner ->
                 Box {
-                    if (note.isEmpty()) Text(stringResource(R.string.print_write), fontFamily = Hand, fontSize = 25.sp, color = U.c.faint)
+                    if (note.isEmpty()) Text(stringResource(R.string.print_write), fontFamily = Hand, fontSize = 25.sp, color = Paper.faint)
                     inner()
                 }
             },
         )
         Row(verticalAlignment = Alignment.CenterVertically) {
-            Text(stringResource(R.string.print_by), fontFamily = Hand, fontSize = 20.sp, color = U.c.muted)
+            Text(stringResource(R.string.print_by), fontFamily = Hand, fontSize = 20.sp, color = Paper.faint)
             Spacer(Modifier.width(6.dp))
             BasicTextField(
                 by, { by = it.take(30) }, Modifier.weight(1f),
                 singleLine = true,
-                textStyle = UType.Hand.copy(fontSize = 22.sp),
+                textStyle = UType.Hand.copy(fontSize = 22.sp, color = Paper.pen),
                 cursorBrush = SolidColor(U.c.teal),
                 decorationBox = { inner ->
                     Box {
-                        if (by.isEmpty()) Text(data.settings.keeper.ifBlank { "…" }, fontFamily = Hand, fontSize = 22.sp, color = U.c.faint, textAlign = TextAlign.Start)
+                        if (by.isEmpty()) Text(data.settings.keeper.ifBlank { "…" }, fontFamily = Hand, fontSize = 22.sp, color = Paper.faint, textAlign = TextAlign.Start)
                         inner()
                     }
                 },

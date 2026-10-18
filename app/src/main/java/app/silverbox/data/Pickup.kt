@@ -20,7 +20,10 @@ import app.silverbox.domain.Stock
  * clips onto the cassette.
  */
 object Pickup {
-    /** How long after opening the camera its pictures still count as this session's. */
+    /**
+     * The longest one trip to the camera can count for. A trip ends as soon as the keeper is back in the
+     * app; this only caps it when the app was gone for hours (closed, or killed by the system).
+     */
     const val SESSION = 30 * 60_000L
 
     class Found(val uri: Uri, val video: Boolean, val takenAt: Long)
@@ -42,19 +45,20 @@ object Pickup {
 
     fun hasCamera(context: Context): Boolean = cameraIntent().resolveActivity(context.packageManager) != null
 
-    /** New camera pictures and clips since [since], oldest first, skipping ones already on film. */
-    fun find(context: Context, since: Long, known: Set<String>): List<Found> {
+    /** New camera pictures and clips added between [since] and [until], oldest first, skipping ones already on film. */
+    fun find(context: Context, since: Long, until: Long, known: Set<String>): List<Found> {
         val out = mutableListOf<Found>()
         for (video in listOf(false, true)) {
             val collection = if (video) MediaStore.Video.Media.EXTERNAL_CONTENT_URI else MediaStore.Images.Media.EXTERNAL_CONTENT_URI
             val cols = arrayOf(MediaStore.MediaColumns._ID, MediaStore.MediaColumns.DATE_ADDED, MediaStore.MediaColumns.DATE_TAKEN)
             // Only the camera's folder: no screenshots, downloads or other apps' pictures.
             val (where, args) = if (Build.VERSION.SDK_INT >= 29) {
-                "${MediaStore.MediaColumns.DATE_ADDED} >= ? AND ${MediaStore.MediaColumns.RELATIVE_PATH} LIKE 'DCIM/%' AND ${MediaStore.MediaColumns.IS_PENDING} = 0" to
-                    arrayOf(((since / 1000) - 2).toString())
+                "${MediaStore.MediaColumns.DATE_ADDED} >= ? AND ${MediaStore.MediaColumns.DATE_ADDED} <= ? AND ${MediaStore.MediaColumns.RELATIVE_PATH} LIKE 'DCIM/%' AND ${MediaStore.MediaColumns.IS_PENDING} = 0" to
+                    arrayOf(((since / 1000) - 2).toString(), (until / 1000 + 2).toString())
             } else {
                 @Suppress("DEPRECATION")
-                "${MediaStore.MediaColumns.DATE_ADDED} >= ? AND ${MediaStore.MediaColumns.DATA} LIKE '%/DCIM/%'" to arrayOf(((since / 1000) - 2).toString())
+                "${MediaStore.MediaColumns.DATE_ADDED} >= ? AND ${MediaStore.MediaColumns.DATE_ADDED} <= ? AND ${MediaStore.MediaColumns.DATA} LIKE '%/DCIM/%'" to
+                    arrayOf(((since / 1000) - 2).toString(), (until / 1000 + 2).toString())
             }
             runCatching {
                 context.contentResolver.query(collection, cols, where, args, "${MediaStore.MediaColumns.DATE_ADDED} ASC")?.use { c ->
@@ -71,9 +75,9 @@ object Pickup {
     }
 
     /** Looks at the gallery and loads anything new onto the film. */
-    suspend fun load(context: Context, db: LabDatabase, vault: Vault, since: Long, now: Long = System.currentTimeMillis()): Loaded {
+    suspend fun load(context: Context, db: LabDatabase, vault: Vault, since: Long, until: Long, now: Long = System.currentTimeMillis()): Loaded {
         val dao = db.dao()
-        val found = find(context, since, dao.sources().toSet())
+        val found = find(context, since, until, dao.sources().toSet())
         if (found.isEmpty()) return Loaded(emptyList(), 0, 0, 0, 0)
         val taken = mutableListOf<Uri>()
         var leftover = 0

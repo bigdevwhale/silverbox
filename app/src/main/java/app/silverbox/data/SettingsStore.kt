@@ -35,7 +35,11 @@ data class Settings(
     val remindTo: Int = 20 * 60,
     /** A developed print can be turned to the picture the camera took, before the lab. */
     val originals: Boolean = false,
+    /** How the app looks: as the system, the cream shop, or the darkroom. */
+    val appearance: Appearance = Appearance.SYSTEM,
 )
+
+enum class Appearance { SYSTEM, LIGHT, DARK }
 
 class SettingsStore(context: Context) {
     private val store = context.applicationContext.dataStore
@@ -54,6 +58,7 @@ class SettingsStore(context: Context) {
         remindFrom = this[REMIND_FROM] ?: 10 * 60,
         remindTo = this[REMIND_TO] ?: 20 * 60,
         originals = this[ORIGINALS] ?: false,
+        appearance = this[APPEARANCE]?.let { runCatching { Appearance.valueOf(it) }.getOrNull() } ?: Appearance.SYSTEM,
     )
 
     suspend fun now(): Settings = settings.first()
@@ -72,6 +77,7 @@ class SettingsStore(context: Context) {
             it[REMIND_FROM] = s.remindFrom
             it[REMIND_TO] = s.remindTo
             it[ORIGINALS] = s.originals
+            it[APPEARANCE] = s.appearance.name
         }
     }
 
@@ -87,5 +93,6 @@ class SettingsStore(context: Context) {
         val REMIND_FROM = intPreferencesKey("remind_from")
         val REMIND_TO = intPreferencesKey("remind_to")
         val ORIGINALS = booleanPreferencesKey("originals")
+        val APPEARANCE = stringPreferencesKey("appearance")
     }
 }
