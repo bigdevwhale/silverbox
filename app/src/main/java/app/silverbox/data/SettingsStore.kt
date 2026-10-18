@@ -25,6 +25,8 @@ data class Settings(
     val shootingSince: Long = 0,
     /** The keeper's name, written on the backs of prints as the photographer. */
     val keeper: String = "",
+    /** The projector's clatter while a film plays. */
+    val projector: Boolean = true,
 )
 
 class SettingsStore(context: Context) {
@@ -39,6 +41,7 @@ class SettingsStore(context: Context) {
         notify = this[NOTIFY] ?: true,
         shootingSince = this[SHOOTING] ?: 0L,
         keeper = this[KEEPER] ?: "",
+        projector = this[PROJECTOR] ?: true,
     )
 
     suspend fun now(): Settings = settings.first()
@@ -52,6 +55,7 @@ class SettingsStore(context: Context) {
             it[NOTIFY] = s.notify
             it[SHOOTING] = s.shootingSince
             it[KEEPER] = s.keeper
+            it[PROJECTOR] = s.projector
         }
     }
 
@@ -62,5 +66,6 @@ class SettingsStore(context: Context) {
         val NOTIFY = booleanPreferencesKey("notify")
         val SHOOTING = longPreferencesKey("shooting_since")
         val KEEPER = stringPreferencesKey("keeper")
+        val PROJECTOR = booleanPreferencesKey("projector")
     }
 }

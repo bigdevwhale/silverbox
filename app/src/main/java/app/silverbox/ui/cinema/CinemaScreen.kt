@@ -70,7 +70,7 @@ fun CinemaScreen(id: Long, data: LabData, go: Go) {
     val roll = data.roll(id) ?: return
     val file = c.container.vault.file(roll.film)
     var playing by remember { mutableStateOf(true) }
-    var sound by remember { mutableStateOf(true) }
+    val sound = data.settings.projector
     val player = remember(file) {
         ExoPlayer.Builder(c).build().apply {
             setMediaItem(MediaItem.fromUri(Uri.fromFile(file)))
@@ -85,9 +85,17 @@ fun CinemaScreen(id: Long, data: LabData, go: Go) {
             })
         }
     }
-    val clatter = remember { runCatching { MediaPlayer.create(c, R.raw.projector)?.apply { isLooping = true; setVolume(0.35f, 0.35f) } }.getOrNull() }
+    val clatter = remember { runCatching { MediaPlayer.create(c, R.raw.projector)?.apply { isLooping = true; setVolume(0.18f, 0.18f) } }.getOrNull() }
+    val view = androidx.compose.ui.platform.LocalView.current
     DisposableEffect(player) {
+        // The room is dark: light icons in the bars while the film is on.
+        val window = (view.context as? android.app.Activity)?.window
+        val bars = window?.let { androidx.core.view.WindowCompat.getInsetsController(it, view) }
+        bars?.isAppearanceLightStatusBars = false
+        bars?.isAppearanceLightNavigationBars = false
         onDispose {
+            bars?.isAppearanceLightStatusBars = true
+            bars?.isAppearanceLightNavigationBars = true
             player.release()
             clatter?.release()
         }
@@ -121,7 +129,7 @@ fun CinemaScreen(id: Long, data: LabData, go: Go) {
             Row(Modifier.fillMaxWidth().padding(horizontal = 6.dp), verticalAlignment = Alignment.CenterVertically) {
                 IconButton(onClick = { go.back() }) { Icon(Icons.AutoMirrored.Rounded.ArrowBack, stringResource(R.string.back), tint = Color(0xFFE9E1D0)) }
                 Text(T.rollName(c, roll), fontFamily = Hand, fontSize = 24.sp, color = Color(0xFFE9E1D0), modifier = Modifier.weight(1f))
-                IconButton(onClick = { sound = !sound }) {
+                IconButton(onClick = { c.container.write { settings.update { it.copy(projector = !sound) } } }) {
                     Icon(if (sound) Icons.AutoMirrored.Rounded.VolumeUp else Icons.AutoMirrored.Rounded.VolumeOff, stringResource(R.string.film_sound), tint = Color(0xFFE9E1D0))
                 }
             }

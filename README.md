@@ -17,6 +17,8 @@
 
 **English** · [Русский](README.ru.md) · [Changelog](CHANGELOG.md)
 
+<img src="docs/screenshots/overview.png" alt="Silverbox on a phone: the lab counter with an envelope waiting, the stack of prints, the family album and the shelf of developed rolls" width="100%" />
+
 </div>
 
 ---

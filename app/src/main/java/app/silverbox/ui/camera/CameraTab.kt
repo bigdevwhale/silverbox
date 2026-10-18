@@ -85,7 +85,7 @@ fun CameraTab(data: LabData, go: Go, loaded: Pickup.Loaded?, dismissLoaded: () -
         }
         Spacer(Modifier.height(12.dp))
 
-        if (!Pickup.canRead(c) && data.camera != null) NoAccessCard(go)
+        if (!Pickup.canRead(c) && data.camera != null && !app.silverbox.BuildConfig.DEMO) NoAccessCard(go)
 
         data.waiting.forEach { r ->
             ReadyCard(r, data, go)

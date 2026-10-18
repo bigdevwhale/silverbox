@@ -10,6 +10,8 @@
 
 [English](README.md) · **Русский** · [Изменения](CHANGELOG.md)
 
+<img src="docs/screenshots/overview.ru.png" alt="Silverbox на телефоне: фотоателье с готовым конвертом, стопка отпечатков, семейный альбом и полка проявленных плёнок" width="100%" />
+
 </div>
 
 ---
