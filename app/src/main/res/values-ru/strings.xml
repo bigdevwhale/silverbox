@@ -276,6 +276,26 @@
         <item quantity="other">Ждут %d конверта.</item>
     </plurals>
 
+    <!-- Reminders -->
+    <string name="set_remind">Напоминания сделать кадр</string>
+    <string name="set_remind_hint">Сколько раз в день напоминать, с подсказкой, что снять. Не беспокоит, если вы снимали в последние полтора часа.</string>
+    <string name="set_remind_off">Выкл</string>
+    <string name="set_remind_from">Не раньше</string>
+    <string name="set_remind_to">Не позже</string>
+    <string name="channel_remind">Напоминания</string>
+    <string name="channel_remind_desc">Напоминание сделать кадр</string>
+    <string name="remind_title">Время для кадра</string>
+    <plurals name="remind_text">
+        <item quantity="one">На плёнке остался %1$d кадр. Например: %2$s.</item>
+        <item quantity="few">На плёнке осталось %1$d кадра. Например: %2$s.</item>
+        <item quantity="many">На плёнке осталось %1$d кадров. Например: %2$s.</item>
+        <item quantity="other">На плёнке осталось %1$d кадра. Например: %2$s.</item>
+    </plurals>
+    <string name="remind_empty_title">Камера пуста</string>
+    <string name="remind_empty_text">Зарядите плёнку и поймайте что-нибудь из сегодняшнего дня.</string>
+    <string name="remind_full_title">Плёнка кончилась</string>
+    <string name="remind_full_text">Сдайте её в фотоателье: конверт будет готов через сутки.</string>
+
     <string-array name="prompts">
         <item>Руки, которые готовят</item>
         <item>Кто-то спит</item>

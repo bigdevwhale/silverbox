@@ -251,6 +251,24 @@
         <item quantity="other">%d envelopes are waiting.</item>
     </plurals>
 
+    <!-- Reminders -->
+    <string name="set_remind">Reminders to take a picture</string>
+    <string name="set_remind_hint">How many times a day to nudge you, with something worth a frame. None if you shot something in the last hour and a half.</string>
+    <string name="set_remind_off">Off</string>
+    <string name="set_remind_from">Not before</string>
+    <string name="set_remind_to">Not after</string>
+    <string name="channel_remind">Reminders</string>
+    <string name="channel_remind_desc">A nudge to take a picture</string>
+    <string name="remind_title">Time for a frame</string>
+    <plurals name="remind_text">
+        <item quantity="one">%1$d frame left on the roll. Maybe: %2$s.</item>
+        <item quantity="other">%1$d frames left on the roll. Maybe: %2$s.</item>
+    </plurals>
+    <string name="remind_empty_title">The camera is empty</string>
+    <string name="remind_empty_text">Load a roll, and catch something from today.</string>
+    <string name="remind_full_title">The roll is finished</string>
+    <string name="remind_full_text">Take it to the lab: the envelope will be ready in a day.</string>
+
     <string-array name="prompts">
         <item>Hands that cook</item>
         <item>Someone asleep</item>

@@ -14,11 +14,14 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Download
 import androidx.compose.material.icons.rounded.Upload
+import androidx.compose.material.icons.rounded.WbSunny
+import androidx.compose.material.icons.rounded.Bedtime
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -35,6 +38,7 @@ import app.silverbox.R
 import app.silverbox.container
 import app.silverbox.data.Backup
 import app.silverbox.data.Settings
+import app.silverbox.domain.Reminders
 import app.silverbox.ui.Go
 import app.silverbox.ui.LabData
 import app.silverbox.ui.Language
@@ -43,6 +47,7 @@ import app.silverbox.ui.components.ConfirmDialog
 import app.silverbox.ui.components.InfoRow
 import app.silverbox.ui.components.SectionTitle
 import app.silverbox.ui.components.SwitchRow
+import app.silverbox.ui.components.TimeDialog
 import app.silverbox.ui.components.TopBar
 import app.silverbox.ui.components.UCard
 import app.silverbox.ui.components.UTextField
@@ -60,6 +65,7 @@ fun SettingsScreen(data: LabData, go: Go) {
     var keeper by remember { mutableStateOf(s.keeper) }
     var status by remember { mutableStateOf<String?>(null) }
     var restoreUri by remember { mutableStateOf<android.net.Uri?>(null) }
+    var timeFor by remember { mutableStateOf(0) }
     fun set(change: (Settings) -> Settings) = c.write { settings.update(change) }
 
     val export = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("application/zip")) { uri ->
@@ -92,6 +98,19 @@ fun SettingsScreen(data: LabData, go: Go) {
             SectionTitle(stringResource(R.string.set_notify_section))
             UCard {
                 SwitchRow(stringResource(R.string.set_notify), stringResource(R.string.set_notify_hint), s.notify, { on -> set { it.copy(notify = on) } })
+                Spacer(Modifier.height(10.dp))
+                Text(stringResource(R.string.set_remind), style = UType.Body)
+                Text(stringResource(R.string.set_remind_hint), style = UType.Muted)
+                Spacer(Modifier.height(8.dp))
+                Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                    Reminders.COUNTS.forEach { n ->
+                        Chip(if (n == 0) stringResource(R.string.set_remind_off) else n.toString(), s.reminders == n, { set { it.copy(reminders = n) } })
+                    }
+                }
+                if (s.reminders > 0) {
+                    InfoRow(Icons.Rounded.WbSunny, stringResource(R.string.set_remind_from), hm(s.remindFrom), onClick = { timeFor = 1 })
+                    InfoRow(Icons.Rounded.Bedtime, stringResource(R.string.set_remind_to), hm(s.remindTo), onClick = { timeFor = 2 })
+                }
             }
 
             SectionTitle(stringResource(R.string.set_language))
@@ -121,6 +140,14 @@ fun SettingsScreen(data: LabData, go: Go) {
         }
     }
 
+    if (timeFor != 0) {
+        TimeDialog(if (timeFor == 1) s.remindFrom else s.remindTo, onDismiss = { timeFor = 0 }) { m ->
+            // Keep at least an hour between the two ends of the window.
+            if (timeFor == 1) set { it.copy(remindFrom = m.coerceAtMost(it.remindTo - 60)) }
+            else set { it.copy(remindTo = m.coerceAtLeast(it.remindFrom + 60)) }
+        }
+    }
+
     restoreUri?.let { uri ->
         ConfirmDialog(
             stringResource(R.string.backup_import), stringResource(R.string.backup_import_confirm), stringResource(R.string.backup_import_do),
@@ -143,3 +170,5 @@ fun SettingsScreen(data: LabData, go: Go) {
         )
     }
 }
+
+private fun hm(m: Int) = "%02d:%02d".format(m / 60, m % 60)

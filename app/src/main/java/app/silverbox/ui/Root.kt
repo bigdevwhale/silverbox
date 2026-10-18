@@ -135,7 +135,7 @@ class Go(private val nav: NavHostController, val shoot: () -> Unit, val stopShoo
 }
 
 @Composable
-fun SilverboxRoot(settings: Settings) {
+fun SilverboxRoot(settings: Settings, shootRequests: Int = 0) {
     val context = LocalContext.current
     val container = context.container
     val nav = rememberNavController()
@@ -188,6 +188,16 @@ fun SilverboxRoot(settings: Settings) {
                 Pickup.trashRequest(context, uris)?.let { trash.launch(IntentSenderRequest.Builder(it.intentSender).build()) }
             }
             container.changed()
+        }
+    }
+
+    // "Shoot" on a reminder: straight to the camera, once per tap.
+    var shotHandled by rememberSaveable { mutableStateOf(0) }
+    LaunchedEffect(shootRequests) {
+        if (shootRequests > shotHandled && settings.onboarded) {
+            shotHandled = shootRequests
+            Alarms.clearRemind(context)
+            go.shoot()
         }
     }
 

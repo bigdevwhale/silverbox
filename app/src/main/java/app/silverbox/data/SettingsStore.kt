@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
@@ -27,6 +28,11 @@ data class Settings(
     val keeper: String = "",
     /** The projector's clatter while a film plays. */
     val projector: Boolean = true,
+    /** Nudges to take a picture, this many a day; 0 for none. */
+    val reminders: Int = 2,
+    /** The window they come in, minutes after midnight. */
+    val remindFrom: Int = 10 * 60,
+    val remindTo: Int = 20 * 60,
 )
 
 class SettingsStore(context: Context) {
@@ -42,6 +48,9 @@ class SettingsStore(context: Context) {
         shootingSince = this[SHOOTING] ?: 0L,
         keeper = this[KEEPER] ?: "",
         projector = this[PROJECTOR] ?: true,
+        reminders = this[REMINDERS] ?: 2,
+        remindFrom = this[REMIND_FROM] ?: 10 * 60,
+        remindTo = this[REMIND_TO] ?: 20 * 60,
     )
 
     suspend fun now(): Settings = settings.first()
@@ -56,6 +65,9 @@ class SettingsStore(context: Context) {
             it[SHOOTING] = s.shootingSince
             it[KEEPER] = s.keeper
             it[PROJECTOR] = s.projector
+            it[REMINDERS] = s.reminders
+            it[REMIND_FROM] = s.remindFrom
+            it[REMIND_TO] = s.remindTo
         }
     }
 
@@ -67,5 +79,8 @@ class SettingsStore(context: Context) {
         val SHOOTING = longPreferencesKey("shooting_since")
         val KEEPER = stringPreferencesKey("keeper")
         val PROJECTOR = booleanPreferencesKey("projector")
+        val REMINDERS = intPreferencesKey("reminders")
+        val REMIND_FROM = intPreferencesKey("remind_from")
+        val REMIND_TO = intPreferencesKey("remind_to")
     }
 }
