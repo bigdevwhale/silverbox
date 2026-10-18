@@ -153,6 +153,12 @@ fun SilverboxRoot(settings: Settings) {
     val askRead = rememberLauncherForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { granted ->
         if (Pickup.canRead(context)) startShooting(context) else if (granted.isNotEmpty()) openAppSettings(context)
     }
+    // Onboarding only asks; the camera opens when there is film to shoot.
+    var readTick by remember { mutableStateOf(0) }
+    val askReadOnly = rememberLauncherForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { granted ->
+        readTick++
+        if (!Pickup.canRead(context) && granted.isNotEmpty() && granted.values.none { it }) openAppSettings(context)
+    }
     val go = remember(nav) {
         Go(
             nav,
@@ -190,6 +196,8 @@ fun SilverboxRoot(settings: Settings) {
         if (settings.onboarded && nav.currentDestination?.route == "welcome") nav.navigate("main") { popUpTo("welcome") { inclusive = true } }
     }
     LaunchedEffect(data.waiting.size) { if (data.waiting.isNotEmpty()) Alarms.clear(context) }
+    // The note about what went on the film belongs to that roll: gone once it is at the lab.
+    LaunchedEffect(data.camera?.id) { if (data.camera == null) loaded = null }
 
     val askNotify = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) {
         container.scope.launch { container.changed() }
@@ -211,7 +219,7 @@ fun SilverboxRoot(settings: Settings) {
         popExitTransition = { fadeOut(tween(160)) },
     ) {
         composable("welcome") {
-            OnboardingScreen(askRead = { askRead.launch(Pickup.permissions()) }) {
+            OnboardingScreen(readTick, askRead = { askReadOnly.launch(Pickup.permissions()) }) {
                 container.write { this.settings.update { it.copy(onboarded = true) } }
                 nav.navigate("main") { popUpTo("welcome") { inclusive = true } }
                 go.load(Format.PHOTO)

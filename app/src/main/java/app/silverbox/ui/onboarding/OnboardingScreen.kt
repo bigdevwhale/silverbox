@@ -22,6 +22,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -47,7 +48,7 @@ import app.silverbox.ui.theme.UType
 
 /** Three pages: the idea, how a roll goes round, and the one permission it needs. */
 @Composable
-fun OnboardingScreen(askRead: () -> Unit, onDone: () -> Unit) {
+fun OnboardingScreen(readTick: Int, askRead: () -> Unit, onDone: () -> Unit) {
     val c = ctx()
     var page by rememberSaveable { mutableIntStateOf(0) }
     Column(Modifier.fillMaxSize().background(U.c.bg).statusBarsPadding().navigationBarsPadding().padding(horizontal = 24.dp)) {
@@ -87,7 +88,8 @@ fun OnboardingScreen(askRead: () -> Unit, onDone: () -> Unit) {
                     Spacer(Modifier.height(12.dp))
                     Text(stringResource(R.string.onb3_text), style = UType.Sub.copy(textAlign = TextAlign.Center))
                     Spacer(Modifier.height(20.dp))
-                    if (!Pickup.canRead(c)) SoftButton(stringResource(R.string.onb3_allow), askRead)
+                    // readTick changes after the permission dialog, so this is looked at again.
+                    if (!remember(readTick) { Pickup.canRead(c) }) SoftButton(stringResource(R.string.onb3_allow), askRead)
                     else Text(stringResource(R.string.onb3_allowed), style = UType.Muted.copy(color = U.c.teal))
                 }
             }

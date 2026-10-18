@@ -87,7 +87,8 @@ object Movie {
         val look = Film.aged(stock.look, 0f)
         val rnd = Random(seed)
         val effects = listOf<Effect>(
-            FrameDropEffect.createDefaultFrameDropEffect(FPS),
+            // Phones film at 30: keep three frames in five for the jerk of 18 fps (the default dropper trips some GPUs).
+            FrameDropEffect.createSimpleFrameDropEffect(30f, FPS),
             SingleColorLut.createFromCube(cube(look)),
             weave(rnd.nextInt()),
             flicker(rnd.nextInt()),
@@ -98,6 +99,19 @@ object Movie {
             .build()
 
         out.delete()
+        try {
+            export(context, composition, out)
+        } catch (e: Exception) {
+            // Half a film is no film.
+            out.delete()
+            throw e
+        } finally {
+            opening.delete()
+            closing.delete()
+        }
+    }
+
+    private suspend fun export(context: Context, composition: Composition, out: File) {
         withContext(Dispatchers.Main) {
             suspendCancellableCoroutine { cont ->
                 val transformer = Transformer.Builder(context)
@@ -112,12 +126,14 @@ object Movie {
                         }
                     })
                     .build()
-                transformer.start(composition, out.path)
+                try {
+                    transformer.start(composition, out.path)
+                } catch (e: Exception) {
+                    cont.resumeWithException(e)
+                }
                 cont.invokeOnCancellation { transformer.cancel() }
             }
         }
-        opening.delete()
-        closing.delete()
     }
 
     /** The stock's colour as a 3D lookup table, from the same curve the prints use. */
