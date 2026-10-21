@@ -71,6 +71,8 @@ fun SettingsScreen(data: LabData, go: Go) {
     var timeFor by remember { mutableStateOf(0) }
     var returning by remember { mutableStateOf(false) }
     var galleryStatus by remember { mutableStateOf<String?>(null) }
+    /** Leave to write was asked for "Back to the gallery" (all of it), not for the switch. */
+    var everything by remember { mutableStateOf(false) }
     fun set(change: (Settings) -> Settings) = c.write { settings.update(change) }
 
     val export = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("application/zip")) { uri ->
@@ -80,7 +82,7 @@ fun SettingsScreen(data: LabData, go: Go) {
             status = context.getString(if (ok) R.string.backup_done else R.string.backup_failed)
         }
     }
-    fun giveBack() {
+    fun giveAllBack() {
         c.scope.launch {
             val n = runCatching { withContext(Dispatchers.IO) { Gallery.restore(context, c.db.dao().rolls(), c.db.dao().frames(), c.vault) } }.getOrNull()
             galleryStatus = when {
@@ -91,7 +93,9 @@ fun SettingsScreen(data: LabData, go: Go) {
         }
     }
     val askWrite = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
-        if (granted) giveBack() else galleryStatus = context.getString(R.string.gallery_failed)
+        if (!granted) galleryStatus = context.getString(R.string.gallery_failed)
+        else if (everything) { everything = false; giveAllBack() }
+        else c.write { giveBack() }
     }
     val import = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri -> restoreUri = uri }
 
@@ -153,6 +157,13 @@ fun SettingsScreen(data: LabData, go: Go) {
             SectionTitle(stringResource(R.string.set_originals))
             UCard {
                 SwitchRow(stringResource(R.string.set_originals_show), stringResource(R.string.set_originals_show_hint), s.originals, { on -> set { it.copy(originals = on) } })
+                SwitchRow(stringResource(R.string.gallery_auto), stringResource(R.string.gallery_auto_hint), s.giveBack, { on ->
+                    c.write {
+                        settings.update { it.copy(giveBack = on) }
+                        giveBack()
+                    }
+                    if (on && Gallery.needsPermission(context)) askWrite.launch(android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                })
                 InfoRow(Icons.Rounded.PhotoLibrary, stringResource(R.string.gallery_return), stringResource(R.string.gallery_return_hint), onClick = { returning = true })
                 galleryStatus?.let { Text(it, style = UType.Muted.copy(color = U.c.teal)) }
             }
@@ -186,7 +197,10 @@ fun SettingsScreen(data: LabData, go: Go) {
         ConfirmDialog(
             stringResource(R.string.gallery_return), stringResource(R.string.gallery_return_confirm), stringResource(R.string.gallery_return_do),
             onConfirm = {
-                if (Gallery.needsPermission(context)) askWrite.launch(android.Manifest.permission.WRITE_EXTERNAL_STORAGE) else giveBack()
+                if (Gallery.needsPermission(context)) {
+                    everything = true
+                    askWrite.launch(android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                } else giveAllBack()
             },
             onDismiss = { returning = false },
         )

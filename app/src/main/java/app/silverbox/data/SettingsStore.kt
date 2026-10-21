@@ -24,6 +24,8 @@ data class Settings(
     val notify: Boolean = true,
     /** The camera was opened from the app at this moment; what it takes since then goes on the film. 0 when not shooting. */
     val shootingSince: Long = 0,
+    /** When the keeper came back from that trip; 0 while still out. The trip ends once its pictures are in. */
+    val shootingBack: Long = 0,
     /** The keeper's name, written on the backs of prints as the photographer. */
     val keeper: String = "",
     /** The projector's clatter while a film plays. */
@@ -35,6 +37,8 @@ data class Settings(
     val remindTo: Int = 20 * 60,
     /** A developed print can be turned to the picture the camera took, before the lab. */
     val originals: Boolean = false,
+    /** The camera's originals go back to the phone's gallery by themselves when an envelope is opened. */
+    val giveBack: Boolean = false,
     /** How the app looks: as the system, the cream shop, or the darkroom. */
     val appearance: Appearance = Appearance.SYSTEM,
 )
@@ -52,12 +56,14 @@ class SettingsStore(context: Context) {
         dateStamp = this[DATE_STAMP] ?: true,
         notify = this[NOTIFY] ?: true,
         shootingSince = this[SHOOTING] ?: 0L,
+        shootingBack = this[SHOOTING_BACK] ?: 0L,
         keeper = this[KEEPER] ?: "",
         projector = this[PROJECTOR] ?: true,
         reminders = this[REMINDERS] ?: 2,
         remindFrom = this[REMIND_FROM] ?: 10 * 60,
         remindTo = this[REMIND_TO] ?: 20 * 60,
         originals = this[ORIGINALS] ?: false,
+        giveBack = this[GIVE_BACK] ?: false,
         appearance = this[APPEARANCE]?.let { runCatching { Appearance.valueOf(it) }.getOrNull() } ?: Appearance.SYSTEM,
     )
 
@@ -71,12 +77,14 @@ class SettingsStore(context: Context) {
             it[DATE_STAMP] = s.dateStamp
             it[NOTIFY] = s.notify
             it[SHOOTING] = s.shootingSince
+            it[SHOOTING_BACK] = s.shootingBack
             it[KEEPER] = s.keeper
             it[PROJECTOR] = s.projector
             it[REMINDERS] = s.reminders
             it[REMIND_FROM] = s.remindFrom
             it[REMIND_TO] = s.remindTo
             it[ORIGINALS] = s.originals
+            it[GIVE_BACK] = s.giveBack
             it[APPEARANCE] = s.appearance.name
         }
     }
@@ -87,12 +95,14 @@ class SettingsStore(context: Context) {
         val DATE_STAMP = booleanPreferencesKey("date_stamp")
         val NOTIFY = booleanPreferencesKey("notify")
         val SHOOTING = longPreferencesKey("shooting_since")
+        val SHOOTING_BACK = longPreferencesKey("shooting_back")
         val KEEPER = stringPreferencesKey("keeper")
         val PROJECTOR = booleanPreferencesKey("projector")
         val REMINDERS = intPreferencesKey("reminders")
         val REMIND_FROM = intPreferencesKey("remind_from")
         val REMIND_TO = intPreferencesKey("remind_to")
         val ORIGINALS = booleanPreferencesKey("originals")
+        val GIVE_BACK = booleanPreferencesKey("give_back")
         val APPEARANCE = stringPreferencesKey("appearance")
     }
 }

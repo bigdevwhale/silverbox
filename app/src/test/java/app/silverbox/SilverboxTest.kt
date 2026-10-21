@@ -58,9 +58,21 @@ class SilverboxTest {
     }
 
     @Test
-    fun clipsAreCutFromTheMiddle() {
-        assertEquals(0L, Rules.clipStart(2000))
-        assertEquals(1000L, Rules.clipStart(5000))
+    fun filmsKeepTheShapeOfTheClips() {
+        assertEquals(9 to 16, Rules.shape(1080, 1920))
+        assertEquals(16 to 9, Rules.shape(3840, 2160))
+        assertEquals(4 to 3, Rules.shape(640, 480))
+        assertEquals(1 to 1, Rules.shape(1080, 1080))
+    }
+
+    @Test
+    fun aTripLastsWhileThePicturesKeepComing() {
+        val min = 60_000L
+        // A party: an hour and a half of pictures, none more than 45 minutes apart, then the camera on its own next day.
+        val added = listOf(-1_000L, 5 * min, 40 * min, 80 * min, 90 * min, 26 * 60 * min)
+        assertEquals(added.take(5), Rules.trip(added, 0L, 45 * min) { it })
+        // Nothing for the first hour: whatever comes after is not this trip's.
+        assertEquals(emptyList<Long>(), Rules.trip(listOf(60 * min), 0L, 45 * min) { it })
     }
 
     @Test
@@ -79,9 +91,9 @@ class SilverboxTest {
 
     @Test
     fun defectsFallWhereFilmHasThem() {
-        assertEquals(Defect.FIRST, Film.defect(1, 24, true, 1))
-        assertEquals(Defect.CUT, Film.defect(24, 24, true, 1))
-        assertTrue(Film.defect(24, 24, false, 1) != Defect.CUT)
+        assertEquals(Defect.FIRST, Film.defect(1, 1))
+        // The last frame of a roll is a whole picture like any other.
+        assertTrue((2..36).none { Film.defect(it, 1) == Defect.FIRST })
     }
 
     @Test

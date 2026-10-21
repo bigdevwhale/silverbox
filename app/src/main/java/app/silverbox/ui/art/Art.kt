@@ -62,6 +62,7 @@ fun stockName(s: Stock): String = when (s) {
     Stock.SLIDE -> "Slide"
     Stock.HOME8 -> "Home 8"
     Stock.SILVER8 -> "Silver 8"
+    Stock.VHS -> "VHS"
 }
 
 /** "Sunny 200", "Home 8". */
@@ -117,14 +118,23 @@ fun FilmBox(stock: Stock, exposures: Int, modifier: Modifier = Modifier) {
                 fontSize = (w.value * 0.19f).sp, lineHeight = (w.value * 0.2f).sp, letterSpacing = (w.value * 0.004f).sp, maxLines = 1,
             )
             Text(
-                if (stock.format == app.silverbox.domain.Format.MOVIE) "SUPER 8" else "COLOR FILM".takeIf { !stock.bw } ?: "B&W FILM",
+                when {
+                    stock.tape -> "VIDEO CASSETTE"
+                    stock.format == app.silverbox.domain.Format.MOVIE -> "SUPER 8"
+                    stock.bw -> "B&W FILM"
+                    else -> "COLOR FILM"
+                },
                 color = ink.copy(alpha = 0.8f), fontFamily = Mono, fontSize = (w.value * 0.075f).sp, maxLines = 1,
             )
         }
         Box(Modifier.fillMaxSize().padding(w * 0.08f), contentAlignment = Alignment.BottomStart) {
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.Bottom) {
                 Text(
-                    if (stock.format == app.silverbox.domain.Format.MOVIE) "50ft" else stock.iso.toString(),
+                    when {
+                        stock.tape -> "E-180"
+                        stock.format == app.silverbox.domain.Format.MOVIE -> "50ft"
+                        else -> stock.iso.toString()
+                    },
                     color = ink, fontFamily = Nunito, fontWeight = FontWeight.Bold, fontSize = (w.value * 0.24f).sp, lineHeight = (w.value * 0.24f).sp,
                 )
                 Text(
@@ -198,6 +208,7 @@ fun DrawScope.canister(stock: Stock) {
 /** A Super 8 cartridge, face on: a square of plastic with the label window and the gate notch. */
 @Composable
 fun Cassette(stock: Stock, modifier: Modifier = Modifier) {
+    if (stock.tape) return VideoTape(stock, modifier)
     Canvas(modifier.aspectRatio(1.1f)) {
         val w = size.width
         val h = size.height
@@ -232,6 +243,40 @@ fun Cassette(stock: Stock, modifier: Modifier = Modifier) {
             drawCircle(Color(0xFF55504A), w * 0.035f, c)
         }
         drawRect(Color(0xFF141210), Offset(w * 0.4f, h * 0.84f), Size(w * 0.14f, h * 0.08f))
+    }
+}
+
+/** A VHS cassette: black, a white label along the top, the two reels behind a smoked window. */
+@Composable
+private fun VideoTape(stock: Stock, modifier: Modifier) {
+    Canvas(modifier.aspectRatio(1.1f)) {
+        val w = size.width
+        val h = size.height
+        // A real tape is wider than this; it is drawn a little square to sit where a cassette does.
+        val top = h * 0.12f
+        val bh = h * 0.72f
+        drawRoundRect(Color.Black.copy(alpha = 0.18f), Offset(w * 0.04f, top + h * 0.05f), Size(w * 0.94f, bh), CornerRadius(w * 0.04f))
+        drawRoundRect(Color(stock.box), Offset(0f, top), Size(w * 0.94f, bh), CornerRadius(w * 0.04f))
+        drawRoundRect(
+            Brush.verticalGradient(listOf(Color.White.copy(alpha = 0.1f), Color.Transparent), top, top + bh * 0.5f), Offset(0f, top), Size(w * 0.94f, bh * 0.5f),
+            CornerRadius(w * 0.04f),
+        )
+        // The label, with the maker's rainbow of stripes.
+        val lx = w * 0.07f
+        val ly = top + bh * 0.08f
+        val lw = w * 0.8f
+        val lh = bh * 0.3f
+        drawRoundRect(Color(0xFFF3EFE6), Offset(lx, ly), Size(lw, lh), CornerRadius(w * 0.015f))
+        val bands = listOf(Color(stock.stripe), Color(0xFFF2A93B), Color(0xFF3B8ED0))
+        bands.forEachIndexed { i, c -> drawRect(c, Offset(lx + lw * 0.62f + i * lw * 0.1f, ly), Size(lw * 0.1f, lh)) }
+        // The window and the reels.
+        val wy = top + bh * 0.48f
+        val wh = bh * 0.32f
+        drawRoundRect(Color(0xFF0B0B0C), Offset(w * 0.22f, wy), Size(w * 0.5f, wh), CornerRadius(w * 0.02f))
+        for (cx in listOf(w * 0.33f, w * 0.61f)) {
+            drawCircle(Color(0xFF2A2724), wh * 0.42f, Offset(cx, wy + wh / 2))
+            drawCircle(Color(0xFFE9E4D8), wh * 0.14f, Offset(cx, wy + wh / 2))
+        }
     }
 }
 

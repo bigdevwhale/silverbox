@@ -68,7 +68,7 @@ data class Frame(
     val original: String,
     val video: Boolean = false,
     val durationMs: Long = 0,
-    /** Where the three seconds of a clip start. */
+    /** Where the three seconds of a clip started, when the lab still cut them; kept for old backups. */
     val clipStartMs: Long = 0,
     val takenAt: Long,
     /** The gallery item it came from, so the same picture is never loaded twice. */

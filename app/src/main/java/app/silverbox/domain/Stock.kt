@@ -80,9 +80,20 @@ enum class Stock(val format: Format, val iso: Int, val box: Long, val stripe: Lo
         Format.MOVIE, 100, 0xFF2B2B2B, 0xFFE9E4D8,
         Look(contrast = 1.3f, lift = 0.06f, gain = 0.94f, grain = 0.12f, grainSize = 1.7f, halation = 0f, vignette = 0.45f, bw = floatArrayOf(0.4f, 0.45f, 0.15f)),
     ),
+    /** A video tape from the camcorder years: the lab copies the clips onto it, not onto film. */
+    VHS(
+        Format.MOVIE, 180, 0xFF1C1C1E, 0xFFE8473C,
+        Look(
+            wb = floatArrayOf(1.0f, 0.99f, 1.04f), contrast = 0.94f, lift = 0.07f, gain = 0.93f, sat = 1.28f,
+            shadows = floatArrayOf(-0.01f, 0.01f, 0.035f), highlights = floatArrayOf(0.03f, 0.01f, -0.02f),
+            grain = 0f, halation = 0f, vignette = 0.12f,
+        ),
+    ),
     ;
 
     val bw: Boolean get() = look.bw != null
+    /** Video tape rather than film. */
+    val tape: Boolean get() = this == VHS
 
     companion object {
         val photo = entries.filter { it.format == Format.PHOTO }

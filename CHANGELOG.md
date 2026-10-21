@@ -1,5 +1,16 @@
 # Changelog
 
+## [1.4.0]
+
+- Every picture from a trip to the camera reaches the film. Cameras that finish a picture after you are back (or a phone that closes the app while the camera is open) no longer lose frames: the gallery is looked at again for two minutes, and a trip carries on after a restart. A long trip counts as long as the pictures keep coming. If the camera took nothing, the app says so.
+- The last frame of a full roll is a whole picture, no longer cut in half.
+- Cassettes: whole clips with their sound, in the shape they were filmed (upright stays upright), no title cards. Home 8 and Silver 8 flash at each splice and sound like a projector's speaker; the projector's clatter is quieter and one button mutes both.
+- New VHS cassette: soft picture, colour bleeding sideways, wobbly lines, tracking noise, "PLAY" and the camcorder's date in the corner, a tear at every cut.
+- The cinema: a straight beam from the projector onto the screen, its glow on the walls, dust in the light and a row of seats.
+- Picking a film shows three sample prints developed on it.
+- "Print | Original" is a switch of its own above the buttons, so nothing crowds or wraps.
+- Settings → Originals → "Give back by themselves": opening an envelope copies its originals to Pictures/Silverbox.
+
 ## [1.3.0]
 
 - Dark theme, the darkroom: warm near-black, black album pages with white-pen captions; prints and the lab's labels stay paper. Settings → Appearance: as the system, photo shop or darkroom.

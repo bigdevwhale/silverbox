@@ -34,8 +34,10 @@
     </plurals>
     <string name="cassette">Кассета 8 мм</string>
     <string name="cassette_feet">%1$d / %2$d фт</string>
-    <string name="no_cassette">Снимите видео, и оно попадёт на кассету 8 мм</string>
-    <string name="no_cassette_hint">Три секунды от каждого ролика, смонтированные в домашнее кино</string>
+    <string name="tape">Кассета VHS</string>
+    <string name="tape_clips">%1$d / %2$d роликов</string>
+    <string name="no_cassette">Снимите видео, и оно попадёт на кассету: 8 мм или VHS</string>
+    <string name="no_cassette_hint">Ролики целиком, со звуком, склеенные в одно домашнее кино</string>
     <string name="at_lab">В фотоателье</string>
     <string name="lab_ready">будет готово %s</string>
     <string name="lab_ready_express">срочно, будет готово %s</string>
@@ -83,6 +85,8 @@
         <item quantity="many">В камере нет плёнки: %d снимков остались в галерее</item>
         <item quantity="other">В камере нет плёнки: %d снимка остались в галерее</item>
     </plurals>
+    <string name="loaded_looking">Забираю кадры из камеры…</string>
+    <string name="loaded_none">Из камеры ничего нового: снимков после нажатия «Снимать» нет.</string>
     <string name="no_camera">На телефоне не нашлось приложения камеры</string>
     <string name="no_access_title">Нет доступа к фото</string>
     <string name="no_access_text">Разрешите доступ ко всем фото и видео, иначе плёнка не увидит, что сняла камера.</string>
@@ -123,14 +127,16 @@
     <string name="load_title">Зарядить плёнку</string>
     <string name="load_cassette_title">Зарядить кассету</string>
     <string name="load_hint">У каждой плёнки свой характер. Выберите под то, что собираетесь снимать.</string>
-    <string name="load_cassette_hint">Видео с камеры попадают на кассету, по три секунды. Из пятидесяти получается домашнее кино.</string>
+    <string name="load_cassette_hint">Видео с камеры попадают на кассету целиком, до пятидесяти роликов. Ателье склеит их в одно домашнее кино.</string>
     <string name="exposures">Кадров</string>
     <string name="roll_for">Для чего она?</string>
     <string name="roll_for_hint">Лето у бабушки</string>
     <string name="cassette_for_hint">Наша осень</string>
     <string name="roll_rules">Кадры вы не увидите, пока плёнку не проявят. Удалить или переснять нельзя.</string>
-    <string name="cassette_rules">Фильм монтируют в ателье: три секунды из середины каждого ролика, без звука, 18 кадров в секунду.</string>
+    <string name="tape_rules">Ателье переписывает ролики на кассету целиком, со звуком: картинка как с видеомагнитофона, с датой в углу, как писала видеокамера.</string>
+    <string name="cassette_rules">Фильм монтируют в ателье: ролики целиком, без обрезки кадра, 18 кадров в секунду, а звук — как из динамика старого проектора.</string>
     <string name="load_do">Зарядить</string>
+    <string name="samples">Как она печатает</string>
     <string name="stock_sunny">Тёплая, золотистая. Лето, солнце, дача, светящиеся лица.</string>
     <string name="stock_every">Естественная и мягкая, с нежной зеленью. Дом и будни.</string>
     <string name="stock_night">Крупное зерно и красный ореол вокруг огней. Вечера, гирлянды, свечи.</string>
@@ -138,6 +144,7 @@
     <string name="stock_slide">Сочная и контрастная, с густо-синим небом. Путешествия, море, природа.</string>
     <string name="stock_home8">Тёплый цвет домашнего кино, как в шестидесятые.</string>
     <string name="stock_silver8">Чёрно-белое немое кино.</string>
+    <string name="stock_vhs">Кассета времён видеокамер: мягкая картинка, плывущий цвет, дрожащие строки и дата в углу.</string>
 
     <!-- The lab -->
     <string name="lab_title">Фотоателье</string>
@@ -211,9 +218,7 @@
     <!-- Film -->
     <string name="film_watch">Смотреть фильм</string>
     <string name="film_play">Смотреть</string>
-    <string name="film_sound">Звук проектора</string>
-    <string name="film_default_title">Домашнее кино</string>
-    <string name="film_end">Конец</string>
+    <string name="film_sound">Звук</string>
 
     <!-- Settings -->
     <string name="settings_title">Настройки</string>
@@ -238,8 +243,10 @@
     <string name="set_originals">Оригиналы</string>
     <string name="set_originals_show">Показывать оригиналы</string>
     <string name="set_originals_show_hint">У проявленного отпечатка появится кнопка «Оригинал»: кадр таким, каким его сняла камера, до лаборатории.</string>
-    <string name="gallery_return">Вернуть в галерею</string>
-    <string name="gallery_return_hint">Оригиналы проявленных плёнок — в папку Pictures/Silverbox</string>
+    <string name="gallery_auto">Возвращать в галерею сами</string>
+    <string name="gallery_auto_hint">Когда открываете конверт, оригиналы его кадров сами копируются в Pictures/Silverbox. Отпечатки остаются здесь.</string>
+    <string name="gallery_return">Вернуть в галерею всё сейчас</string>
+    <string name="gallery_return_hint">Оригиналы всех проявленных плёнок — в папку Pictures/Silverbox</string>
     <string name="gallery_return_confirm">Оригиналы камеры со всех проявленных плёнок и кассет скопируются в галерею телефона, в папку Pictures/Silverbox. Отпечатки здесь останутся как есть.</string>
     <string name="gallery_return_do">Скопировать</string>
     <string name="gallery_none">Всё проявленное уже в галерее.</string>

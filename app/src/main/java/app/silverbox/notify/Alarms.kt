@@ -103,7 +103,7 @@ object Alarms {
         val frames = roll?.let { dao.framesOf(it.id) }.orEmpty()
         // Just shot something, or out shooting right now: no need to ask.
         if (frames.any { now - it.takenAt < Reminders.QUIET_AFTER_SHOT }) return
-        if (s.shootingSince > 0 && now - s.shootingSince < Pickup.SESSION) return
+        if (s.shootingSince > 0 && s.shootingBack <= 0 && now - s.shootingSince < Pickup.GAP) return
         val l = context.localized()
         val prompts = l.resources.getStringArray(R.array.prompts)
         val prompt = prompts[java.util.Random(now / 60_000).nextInt(prompts.size)]

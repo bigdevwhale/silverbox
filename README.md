@@ -45,13 +45,13 @@ Phones hold thousands of pictures nobody looks at again. Film made every frame c
 | **Slide 100** | rich and punchy, deep blue skies: travel, the sea |
 | **Home 8 / Silver 8** | 8 mm cassettes for video: home movie in colour or black and white |
 
-Every print is developed on the phone: the stock's curve and colour, grain that lives in the mid-tones, halation round bright lights, a vignette, a 10×15 crop and the orange date of an old point-and-shoot. Film behaves like film: the first frame is fogged by the light that got in while loading, the last frame of a full roll is cut in half where the film ran out, and now and then a leak of light comes in from the edge. Film left in the camera more than two months starts to drift: faded, magenta, grainier.
+Every print is developed on the phone: the stock's curve and colour, grain that lives in the mid-tones, halation round bright lights, a vignette, a 10×15 crop and the orange date of an old point-and-shoot. Film behaves like film: the first frame is fogged by the light that got in while loading, and now and then a leak of light comes in from the edge. Film left in the camera more than two months starts to drift: faded, magenta, grainier.
 
 ## What's inside
 
 | | Feature | How it works |
 |---|---|---|
-| 🎞️ | **8 mm cassette** | Videos go on a cassette, 50 clips. The lab cuts three seconds from the middle of each, adds an intertitle and "The End", and prints it as silent home movie: 4:3, 18 frames a second, grain, dust, flicker and gate weave. Watch it in the dark with the projector clattering. |
+| 🎞️ | **8 mm cassette** | Videos go on a cassette, 50 clips. The lab splices them whole, adds an intertitle and "The End", and prints it as home movie: 18 frames a second, grain, dust, flicker, gate weave and a flash at every splice, the sound thin as from a projector's speaker. Upright clips make an upright film; nothing is cropped. Watch it in the dark with the projector clattering. |
 | ✉️ | **The envelope** | The lab's label on a kraft envelope; the prints come out as a stack you swipe through. |
 | 📖 | **Album and shoebox** | The album holds the chosen prints, two to a page, with black photo corners and what you wrote. The shoebox holds everything, loose, by month. |
 | ✍️ | **The back of the print** | Turn a print over to write on it by hand, and who took it. The lab's stamp is there too. |
@@ -76,7 +76,7 @@ python tools/projector.py               # the projector's sound, synthesised
 
 Kotlin, Jetpack Compose, Room, DataStore, Media3 (ExoPlayer, Transformer). The darkroom is plain pixel work in `develop/Film.kt`; the 8 mm lab is `develop/Movie.kt`.
 
-Demo photos are from [Unsplash](https://unsplash.com) via [Lorem Picsum](https://picsum.photos) (authors in [docs/demo-credits.txt](docs/demo-credits.txt)), used under the Unsplash License, and ship only in the demo build. The film names are the app's own.
+Demo photos are from [Unsplash](https://unsplash.com) via [Lorem Picsum](https://picsum.photos) (authors in [docs/demo-credits.txt](docs/demo-credits.txt)), used under the Unsplash License, and ship only in the demo build, except three (195, 199, 822) that every build develops on each film for the samples on the film shelf. The film names are the app's own.
 
 ## License
 

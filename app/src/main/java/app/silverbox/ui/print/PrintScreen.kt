@@ -7,6 +7,7 @@ import android.graphics.Bitmap
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -15,11 +16,13 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.pager.HorizontalPager
@@ -28,6 +31,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.RotateRight
+import androidx.compose.material.icons.rounded.Image
 import androidx.compose.material.icons.rounded.PhotoCamera
 import androidx.compose.material.icons.rounded.Share
 import androidx.compose.material3.Icon
@@ -42,7 +46,9 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.graphicsLayer
@@ -112,6 +118,10 @@ fun PrintScreen(id: Long, scope: Scope, data: LabData, go: Go) {
                 listOfNotNull(T.date(c, current.takenAt), roll?.let { stockLabel(it.stockOf) }, "${current.number} / ${roll?.capacity ?: list.size}").joinToString(" · "),
                 style = UType.Mono.copy(fontSize = 12.sp, color = U.c.muted),
             )
+            if (canOriginal) {
+                Spacer(Modifier.height(10.dp))
+                PrintOrOriginal(original) { original = it; back = false }
+            }
             Spacer(Modifier.height(10.dp))
             Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                 Heart(current.album) { on -> c.container.write { db.dao().frame(current.id)?.let { db.dao().update(it.copy(album = on)) } } }
@@ -123,14 +133,26 @@ fun PrintScreen(id: Long, scope: Scope, data: LabData, go: Go) {
                     Spacer(Modifier.width(6.dp))
                     Text(stringResource(if (back) R.string.print_front else R.string.print_back), style = UType.Button.copy(color = U.c.teal))
                 }
-                if (canOriginal) Row(
-                    Modifier.clickable { original = !original; back = false }.padding(horizontal = 12.dp, vertical = 12.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    Icon(Icons.Rounded.PhotoCamera, null, tint = U.c.teal)
-                    Spacer(Modifier.width(6.dp))
-                    Text(stringResource(if (original) R.string.print_developed else R.string.print_original), style = UType.Button.copy(color = U.c.teal))
-                }
+            }
+        }
+    }
+}
+
+/** Two halves of one pill: the lab's print, or the picture the camera took. */
+@Composable
+private fun PrintOrOriginal(original: Boolean, onChange: (Boolean) -> Unit) {
+    val pill = RoundedCornerShape(50)
+    Row(Modifier.fillMaxWidth().height(42.dp).clip(pill).border(1.dp, U.c.line, pill).padding(3.dp)) {
+        listOf(false to R.string.print_developed, true to R.string.print_original).forEach { (side, label) ->
+            val on = side == original
+            Row(
+                Modifier.weight(1f).fillMaxHeight().clip(pill).background(if (on) U.c.tealSoft else Color.Transparent).clickable { onChange(side) },
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Icon(if (side) Icons.Rounded.PhotoCamera else Icons.Rounded.Image, null, Modifier.size(17.dp), tint = if (on) U.c.teal else U.c.muted)
+                Spacer(Modifier.width(6.dp))
+                Text(stringResource(label), style = UType.Button.copy(color = if (on) U.c.teal else U.c.muted, fontSize = 14.sp), maxLines = 1)
             }
         }
     }

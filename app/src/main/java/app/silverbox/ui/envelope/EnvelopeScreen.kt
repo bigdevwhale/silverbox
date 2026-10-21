@@ -86,7 +86,10 @@ fun EnvelopeScreen(id: Long, data: LabData, go: Go) {
     var index by rememberSaveable { mutableIntStateOf(0) }
 
     LaunchedEffect(open) {
-        if (open && !roll.opened) c.container.write { db.dao().markOpened(id) }
+        if (open && !roll.opened) c.container.write {
+            db.dao().markOpened(id)
+            giveBack()
+        }
     }
 
     Column(Modifier.fillMaxSize().background(U.c.bg).statusBarsPadding().navigationBarsPadding()) {

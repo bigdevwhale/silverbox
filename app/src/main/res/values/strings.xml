@@ -33,8 +33,10 @@
     </plurals>
     <string name="cassette">8 mm cassette</string>
     <string name="cassette_feet">%1$d / %2$d ft</string>
-    <string name="no_cassette">Shoot a video and it goes on an 8 mm cassette</string>
-    <string name="no_cassette_hint">Three seconds of each clip, cut into a home movie</string>
+    <string name="tape">VHS cassette</string>
+    <string name="tape_clips">%1$d / %2$d clips</string>
+    <string name="no_cassette">Shoot a video and it goes on a cassette: 8 mm or VHS</string>
+    <string name="no_cassette_hint">Whole clips, with their sound, spliced into one home movie</string>
     <string name="at_lab">At the lab</string>
     <string name="lab_ready">ready %s</string>
     <string name="lab_ready_express">express, ready %s</string>
@@ -72,6 +74,8 @@
         <item quantity="one">No film in the camera: %d photo stayed in the gallery</item>
         <item quantity="other">No film in the camera: %d photos stayed in the gallery</item>
     </plurals>
+    <string name="loaded_looking">Collecting the frames from the camera…</string>
+    <string name="loaded_none">Nothing new from the camera: no pictures since you tapped Shoot.</string>
     <string name="no_camera">No camera app found on this phone</string>
     <string name="no_access_title">No access to photos</string>
     <string name="no_access_text">Allow access to all photos and videos, or the film can\'t see what your camera took.</string>
@@ -102,14 +106,16 @@
     <string name="load_title">Load film</string>
     <string name="load_cassette_title">Load a cassette</string>
     <string name="load_hint">Every film has its own character. Choose one for what you\'re going to shoot.</string>
-    <string name="load_cassette_hint">Videos from your camera go on the cassette, three seconds each. Fifty of them make a home movie.</string>
+    <string name="load_cassette_hint">Videos from your camera go on the cassette whole, up to fifty of them. The lab splices them into one home movie.</string>
     <string name="exposures">Exposures</string>
     <string name="roll_for">What is it for?</string>
     <string name="roll_for_hint">Summer at Gran\'s</string>
     <string name="cassette_for_hint">Our autumn</string>
     <string name="roll_rules">You won\'t see the frames until the roll is developed. There is no deleting and no second take.</string>
-    <string name="cassette_rules">The film is cut at the lab: three seconds from the middle of each clip, silent, at 18 frames a second.</string>
+    <string name="tape_rules">The lab copies the clips onto the tape whole, with their sound: the picture of a video recorder, with the date in the corner the way the camcorder wrote it.</string>
+    <string name="cassette_rules">The film is cut at the lab: whole clips, nothing cropped from the picture, at 18 frames a second, with the sound of an old projector\'s speaker.</string>
     <string name="load_do">Load</string>
+    <string name="samples">How it prints</string>
     <string name="stock_sunny">Warm and golden. Summer, sun, the dacha, faces that glow.</string>
     <string name="stock_every">Natural and soft, with gentle greens. Home and the everyday.</string>
     <string name="stock_night">Coarse grain and a red glow round every light. Evenings, garlands, candles.</string>
@@ -117,6 +123,7 @@
     <string name="stock_slide">Rich and punchy, with deep blue skies. Travel, the sea, nature.</string>
     <string name="stock_home8">Warm home-movie colour, the way the sixties looked.</string>
     <string name="stock_silver8">Black-and-white silent film.</string>
+    <string name="stock_vhs">A tape from the camcorder years: soft, colour that bleeds, wobbly lines and the date in the corner.</string>
 
     <!-- The lab -->
     <string name="lab_title">Photo lab</string>
@@ -188,9 +195,7 @@
     <!-- Film -->
     <string name="film_watch">Watch the film</string>
     <string name="film_play">Play</string>
-    <string name="film_sound">Projector sound</string>
-    <string name="film_default_title">Home movie</string>
-    <string name="film_end">The End</string>
+    <string name="film_sound">Sound</string>
 
     <!-- Settings -->
     <string name="settings_title">Settings</string>
@@ -215,8 +220,10 @@
     <string name="set_originals">Originals</string>
     <string name="set_originals_show">Show originals</string>
     <string name="set_originals_show_hint">A developed print gets an Original button: the frame as the camera took it, before the lab.</string>
-    <string name="gallery_return">Back to the gallery</string>
-    <string name="gallery_return_hint">Originals of developed rolls go to Pictures/Silverbox</string>
+    <string name="gallery_auto">Give back by themselves</string>
+    <string name="gallery_auto_hint">When you open an envelope, the originals of its frames are copied to Pictures/Silverbox. The prints stay here.</string>
+    <string name="gallery_return">Back to the gallery, all now</string>
+    <string name="gallery_return_hint">Originals of every developed roll go to Pictures/Silverbox</string>
     <string name="gallery_return_confirm">The camera\'s originals from every developed roll and cassette will be copied to the phone\'s gallery, in the Pictures/Silverbox folder. The prints stay here as they are.</string>
     <string name="gallery_return_do">Copy</string>
     <string name="gallery_none">Everything developed is already in the gallery.</string>

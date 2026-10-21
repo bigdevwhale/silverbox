@@ -6,18 +6,29 @@ import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.RadialGradient
-import android.graphics.RectF
 import android.graphics.Shader
 import android.graphics.Typeface
+import android.media.MediaMetadataRetriever
 import android.net.Uri
+import android.opengl.GLES20
 import androidx.annotation.OptIn
 import androidx.core.content.res.ResourcesCompat
 import androidx.media3.common.Effect
 import androidx.media3.common.MediaItem
+import androidx.media3.common.C
 import androidx.media3.common.MimeTypes
+import androidx.media3.common.VideoFrameProcessingException
+import androidx.media3.common.audio.AudioProcessor
+import androidx.media3.common.audio.BaseAudioProcessor
+import androidx.media3.common.util.GlProgram
+import androidx.media3.common.util.GlUtil
+import androidx.media3.common.util.Size
 import androidx.media3.common.util.UnstableApi
+import androidx.media3.effect.BaseGlShaderProgram
 import androidx.media3.effect.BitmapOverlay
 import androidx.media3.effect.FrameDropEffect
+import androidx.media3.effect.GlEffect
+import androidx.media3.effect.GlShaderProgram
 import androidx.media3.effect.MatrixTransformation
 import androidx.media3.effect.OverlayEffect
 import androidx.media3.effect.Presentation
@@ -38,64 +49,85 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
 import java.io.File
-import java.io.FileOutputStream
+import java.nio.ByteBuffer
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
+import kotlin.math.PI
 import kotlin.math.sin
+import kotlin.math.tanh
 import kotlin.random.Random
 
 /**
- * The film lab for cassettes: cuts three seconds from each clip, puts them end to end after a title card,
- * and prints the lot as home movie: 4:3, 18 frames a second, the stock's colour, grain, dust, a flicker
- * and the weave of film in the gate. Silent, as home movies were; the projector supplies the sound.
+ * The lab for cassettes: puts the clips end to end, whole and with their sound, in the shape they were
+ * filmed in, and prints the lot as one of two things. Home movie: 18 frames a second, the stock's colour,
+ * grain, dust, a flicker, the weave of film in the gate and a flash where each clip is spliced on, the sound
+ * thin as from a projector's speaker. Or a VHS tape: soft, colour bleeding sideways, lines that wobble, a
+ * band of tracking noise, the camcorder's date in the corner and a tear in the picture at every cut.
  */
 @OptIn(UnstableApi::class)
 object Movie {
-    const val W = 960
-    const val H = 720
+    /** The long side of the frame; the short one follows the clips. A tape holds less. */
+    const val LONG = 960
+    const val TAPE_LONG = 720
     const val FPS = 18f
 
-    class Clip(val file: File, val startMs: Long)
+    class Clip(val file: File, val durationMs: Long, val takenAt: Long = 0)
+
+    /**
+     * The frame's width and height: the shape most of the clips were filmed in (9:16 upright, 16:9 across),
+     * so they fill it with nothing cut off and no bars; only a clip of another shape sits inside it.
+     */
+    fun gate(clips: List<Clip>, long: Int = LONG): Pair<Int, Int> {
+        val shape = clips.mapNotNull { shape(it.file) }.groupingBy { it }.eachCount().maxByOrNull { it.value }?.key ?: (4 to 3)
+        val (w, h) = shape
+        fun even(v: Float) = (v / 2).toInt() * 2
+        return if (w >= h) long to even(long * h / w.toFloat()) else even(long * w / h.toFloat()) to long
+    }
+
+    /** A clip's width and height as it is watched, reduced to a common shape like 16:9. */
+    private fun shape(f: File): Pair<Int, Int>? = runCatching {
+        MediaMetadataRetriever().run {
+            try {
+                setDataSource(f.path)
+                val w = extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_WIDTH)?.toIntOrNull() ?: 0
+                val h = extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_HEIGHT)?.toIntOrNull() ?: 0
+                val turned = (extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_ROTATION)?.toIntOrNull() ?: 0) % 180 != 0
+                if (w <= 0 || h <= 0) null else Rules.shape(if (turned) h else w, if (turned) w else h)
+            } finally { release() }
+        }
+    }.getOrNull()
 
     /** Writes the film to [out]. Must not be called on the main thread; it hops there for the transformer. */
-    suspend fun develop(context: Context, stock: Stock, clips: List<Clip>, title: String, sub: String, end: String, seed: Int, out: File) {
-        val cards = File(context.cacheDir, "cards").apply { mkdirs() }
-        val opening = File(cards, "title-$seed.png").also { save(card(context, title, sub), it) }
-        val closing = File(cards, "end-$seed.png").also { save(card(context, end, ""), it) }
-        val fit = Presentation.createForWidthAndHeight(W, H, Presentation.LAYOUT_SCALE_TO_FIT_WITH_CROP)
-
-        fun still(f: File, ms: Long) = EditedMediaItem.Builder(MediaItem.Builder().setUri(Uri.fromFile(f)).setImageDurationMs(ms).build())
-            .setFrameRate(FPS.toInt())
-            .setRemoveAudio(true)
-            .setEffects(Effects(listOf(), listOf<Effect>(fit)))
-            .build()
-
-        val items = buildList {
-            add(still(opening, 3000))
-            clips.forEach { c ->
-                val item = MediaItem.Builder()
-                    .setUri(Uri.fromFile(c.file))
-                    .setClippingConfiguration(
-                        MediaItem.ClippingConfiguration.Builder().setStartPositionMs(c.startMs).setEndPositionMs(c.startMs + Rules.CLIP_MS).build()
-                    )
-                    .build()
-                add(EditedMediaItem.Builder(item).setRemoveAudio(true).setEffects(Effects(listOf(), listOf<Effect>(fit))).build())
-            }
-            add(still(closing, 2000))
-        }
+    suspend fun develop(context: Context, stock: Stock, clips: List<Clip>, seed: Int, out: File) {
+        val (w, h) = gate(clips, if (stock.tape) TAPE_LONG else LONG)
+        val fit = Presentation.createForWidthAndHeight(w, h, Presentation.LAYOUT_SCALE_TO_FIT)
+        val items = clips.map { c -> EditedMediaItem.Builder(MediaItem.fromUri(Uri.fromFile(c.file))).setEffects(Effects(listOf(), listOf<Effect>(fit))).build() }
+        // Where one clip is joined to the next, in the film's own time.
+        val cuts = clips.runningFold(0L) { at, c -> at + c.durationMs }
 
         val look = Film.aged(stock.look, 0f)
         val rnd = Random(seed)
-        val effects = listOf<Effect>(
+        val effects = if (stock.tape) listOf<Effect>(
+            SingleColorLut.createFromCube(cube(look)),
+            Tape(rnd.nextInt(), cuts),
+            OverlayEffect(listOf(Camcorder(context, clips, cuts, w, h))),
+        ) else listOf<Effect>(
             // Phones film at 30: keep three frames in five for the jerk of 18 fps (the default dropper trips some GPUs).
             FrameDropEffect.createSimpleFrameDropEffect(30f, FPS),
             SingleColorLut.createFromCube(cube(look)),
             weave(rnd.nextInt()),
-            flicker(rnd.nextInt()),
-            OverlayEffect(listOf(Dirt(look, rnd.nextInt()))),
+            flicker(rnd.nextInt(), cuts.drop(1).dropLast(1)),
+            OverlayEffect(listOf(Dirt(look, rnd.nextInt(), w, h))),
         )
-        val composition = Composition.Builder(EditedMediaItemSequence.Builder(items).build())
-            .setEffects(Effects(listOf(), effects))
+        val speaker = if (stock.tape) Speaker(rnd.nextInt(), low = 90f, high = 7000f, drive = 1.2f, crackle = false)
+        else Speaker(rnd.nextInt(), low = 300f, high = 3500f, drive = 1.6f, crackle = true)
+        val composition = Composition.Builder(
+            // A clip filmed without sound gets silence, so the next one's sound stays in step.
+            EditedMediaItemSequence.Builder(items).experimentalSetForceAudioTrack(true).build()
+        )
+            .setEffects(Effects(listOf<AudioProcessor>(speaker), effects))
+            // Phones film in HDR more and more; home movie is not.
+            .setHdrMode(Composition.HDR_MODE_TONE_MAP_HDR_TO_SDR_USING_OPEN_GL)
             .build()
 
         out.delete()
@@ -105,9 +137,6 @@ object Movie {
             // Half a film is no film.
             out.delete()
             throw e
-        } finally {
-            opening.delete()
-            closing.delete()
         }
     }
 
@@ -180,10 +209,12 @@ object Movie {
         }
     }
 
-    /** The lamp and the shutter: brightness breathing a few percent, frame to frame. */
-    private fun flicker(seed: Int) = RgbMatrix { t, _ ->
+    /** The lamp and the shutter: brightness breathing a few percent, frame to frame, and a flash at each splice. */
+    private fun flicker(seed: Int, splices: List<Long>) = RgbMatrix { t, _ ->
         val frame = (t * FPS / 1_000_000).toLong()
-        val k = 1f + (Random(seed + frame).nextFloat() - 0.5f) * 0.07f
+        val ms = t / 1000
+        val splice = splices.any { ms - it in 0..SPLICE_MS }
+        val k = (1f + (Random(seed + frame).nextFloat() - 0.5f) * 0.07f) * if (splice) 1.7f else 1f
         floatArrayOf(
             k, 0f, 0f, 0f,
             0f, k, 0f, 0f,
@@ -192,8 +223,63 @@ object Movie {
         )
     }
 
+    /** Two frames of light where the tape of a splice went through the gate. */
+    private const val SPLICE_MS = 110L
+
+    /**
+     * The speaker of a projector or an old television: only the band from [low] to [high] Hz, slightly
+     * driven, a hiss under it, and on film the odd crackle of dust on the sound stripe.
+     */
+    private class Speaker(seed: Int, private val low: Float, private val high: Float, private val drive: Float, private val crackle: Boolean) : BaseAudioProcessor() {
+        private val rnd = Random(seed)
+        private var channels = 1
+        private var hpA = 0f
+        private var lpA = 0f
+        private var hpIn = FloatArray(1)
+        private var hpOut = FloatArray(1)
+        private var lp1 = FloatArray(1)
+        private var lp2 = FloatArray(1)
+        private var pop = 0f
+
+        override fun onConfigure(inputAudioFormat: AudioProcessor.AudioFormat): AudioProcessor.AudioFormat {
+            if (inputAudioFormat.encoding != C.ENCODING_PCM_16BIT) return AudioProcessor.AudioFormat.NOT_SET
+            channels = inputAudioFormat.channelCount
+            val dt = 1f / inputAudioFormat.sampleRate
+            val hpRc = 1f / (2f * PI.toFloat() * low)
+            val lpRc = 1f / (2f * PI.toFloat() * high)
+            hpA = hpRc / (hpRc + dt)
+            lpA = dt / (lpRc + dt)
+            return inputAudioFormat
+        }
+
+        override fun onFlush() {
+            hpIn = FloatArray(channels); hpOut = FloatArray(channels); lp1 = FloatArray(channels); lp2 = FloatArray(channels)
+            pop = 0f
+        }
+
+        override fun queueInput(inputBuffer: ByteBuffer) {
+            val out = replaceOutputBuffer(inputBuffer.remaining())
+            val frame = 2 * channels
+            while (inputBuffer.remaining() >= frame) {
+                if (crackle && rnd.nextInt(24_000) == 0) pop = (rnd.nextFloat() - 0.5f) * 0.25f
+                val hiss = (rnd.nextFloat() - 0.5f) * 0.012f
+                for (ch in 0 until channels) {
+                    val x = inputBuffer.short / 32768f
+                    hpOut[ch] = hpA * (hpOut[ch] + x - hpIn[ch]); hpIn[ch] = x
+                    lp1[ch] += lpA * (hpOut[ch] - lp1[ch])
+                    lp2[ch] += lpA * (lp1[ch] - lp2[ch])
+                    val y = tanh(lp2[ch] * drive) / tanh(drive) * 0.85f + hiss + pop
+                    out.putShort((y.coerceIn(-1f, 1f) * 32767f).toInt().toShort())
+                }
+                pop *= 0.96f
+            }
+            inputBuffer.position(inputBuffer.limit())
+            out.flip()
+        }
+    }
+
     /** Grain, vignette, dust and the odd scratch: a few frames' worth, cycled. */
-    private class Dirt(look: Look, seed: Int) : BitmapOverlay() {
+    private class Dirt(look: Look, seed: Int, private val W: Int, private val H: Int) : BitmapOverlay() {
         private val frames = List(6) { i -> paint(look, seed + i * 977) }
 
         override fun getBitmap(presentationTimeUs: Long): Bitmap {
@@ -248,44 +334,149 @@ object Movie {
         }
     }
 
-    /** An intertitle: pale letters in a thin ornamental frame on black, the way silent films said things. */
-    fun card(context: Context, title: String, sub: String): Bitmap {
-        val b = Bitmap.createBitmap(W, H, Bitmap.Config.ARGB_8888)
-        val c = Canvas(b)
-        c.drawColor(Color.rgb(14, 12, 10))
-        val ink = Color.rgb(236, 228, 210)
-        val frame = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = ink; style = Paint.Style.STROKE; strokeWidth = 3f }
-        c.drawRect(RectF(70f, 70f, W - 70f, H - 70f), frame)
-        frame.strokeWidth = 1.2f
-        c.drawRect(RectF(84f, 84f, W - 84f, H - 84f), frame)
-        val dot = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = ink }
-        for ((x, y) in listOf(70f to 70f, W - 70f to 70f, 70f to H - 70f, W - 70f to H - 70f)) c.drawCircle(x, y, 7f, dot)
-
-        val serif = runCatching { ResourcesCompat.getFont(context, R.font.lora_italic) }.getOrNull() ?: Typeface.SERIF
-        val big = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = ink; typeface = serif; textAlign = Paint.Align.CENTER; textSize = 64f }
-        val small = Paint(big).apply { textSize = 34f; color = Color.rgb(196, 186, 166) }
-        val lines = wrap(title, big, W - 240f)
-        val lineH = 80f
-        val block = lines.size * lineH + if (sub.isNotEmpty()) 70f else 0f
-        var y = H / 2f - block / 2f + 56f
-        lines.forEach { line -> c.drawText(line, W / 2f, y, big); y += lineH }
-        if (sub.isNotEmpty()) c.drawText(sub, W / 2f, y + 24f, small)
-        return b
+    /**
+     * The look of a worn tape, in one pass on the GPU: the picture slightly soft, colour smeared to the right
+     * of what it belongs to, every line shaking a little, scanlines and snow, a band of tracking noise
+     * drifting at the bottom, and the picture torn sideways for a moment at every cut.
+     */
+    private class Tape(private val seed: Int, private val cuts: List<Long>) : GlEffect {
+        override fun toGlShaderProgram(context: Context, useHdr: Boolean): GlShaderProgram = TapeProgram(useHdr, seed, cuts)
     }
 
-    private fun wrap(text: String, p: Paint, max: Float): List<String> {
-        val out = mutableListOf<String>()
-        var line = ""
-        text.split(' ').forEach { word ->
-            val next = if (line.isEmpty()) word else "$line $word"
-            if (p.measureText(next) <= max || line.isEmpty()) line = next else { out += line; line = word }
+    private class TapeProgram(useHdr: Boolean, seed: Int, private val cuts: List<Long>) : BaseGlShaderProgram(useHdr, 1) {
+        private val program = GlProgram(VERTEX, FRAGMENT).apply {
+            setBufferAttribute("aFramePosition", GlUtil.getNormalizedCoordinateBounds(), GlUtil.HOMOGENEOUS_COORDINATE_VECTOR_SIZE)
         }
-        if (line.isNotEmpty()) out += line
-        return out.take(3)
+        private val seed = (seed and 0xffff) / 65535f
+        private var size = floatArrayOf(1f, 1f)
+
+        override fun configure(inputWidth: Int, inputHeight: Int): Size {
+            size = floatArrayOf(inputWidth.toFloat(), inputHeight.toFloat())
+            return Size(inputWidth, inputHeight)
+        }
+
+        override fun drawFrame(inputTexId: Int, presentationTimeUs: Long) {
+            val ms = presentationTimeUs / 1000
+            // Just after a cut the heads lose the track for a few frames.
+            val since = cuts.filter { it in 1..ms }.maxOfOrNull { ms - it }
+            val tear = if (since != null && since < 260) 1f - since / 260f else 0f
+            try {
+                program.use()
+                program.setSamplerTexIdUniform("uTexSampler", inputTexId, 0)
+                program.setFloatUniform("uTime", ms / 1000f + seed * 100f)
+                program.setFloatUniform("uTear", tear)
+                program.setFloatsUniform("uSize", size)
+                program.bindAttributesAndUniforms()
+                GLES20.glDrawArrays(GLES20.GL_TRIANGLE_STRIP, 0, 4)
+            } catch (e: GlUtil.GlException) {
+                throw VideoFrameProcessingException(e, presentationTimeUs)
+            }
+        }
+
+        override fun release() {
+            super.release()
+            try { program.delete() } catch (e: GlUtil.GlException) { throw VideoFrameProcessingException(e) }
+        }
+
+        companion object {
+            const val VERTEX = """
+                attribute vec4 aFramePosition;
+                varying vec2 vUv;
+                void main() {
+                    gl_Position = aFramePosition;
+                    vUv = aFramePosition.xy * 0.5 + 0.5;
+                }
+            """
+
+            const val FRAGMENT = """
+                precision highp float;
+                uniform sampler2D uTexSampler;
+                uniform float uTime;
+                uniform float uTear;
+                uniform vec2 uSize;
+                varying vec2 vUv;
+
+                float rand(vec2 p) { return fract(sin(dot(p, vec2(12.9898, 78.233))) * 43758.5453); }
+
+                vec3 toYiq(vec3 c) {
+                    return vec3(dot(c, vec3(0.299, 0.587, 0.114)), dot(c, vec3(0.596, -0.274, -0.322)), dot(c, vec3(0.211, -0.523, 0.312)));
+                }
+                vec3 toRgb(vec3 c) {
+                    return vec3(c.x + 0.956 * c.y + 0.621 * c.z, c.x - 0.272 * c.y - 0.647 * c.z, c.x - 1.106 * c.y + 1.703 * c.z);
+                }
+
+                void main() {
+                    vec2 uv = vUv;
+                    float line = floor((1.0 - uv.y) * uSize.y / 2.0);
+                    float frame = floor(uTime * 30.0);
+                    // The tracking band: a strip near the bottom that drifts up and down.
+                    float bandY = 0.025 + 0.02 * sin(uTime * 0.6);
+                    float band = smoothstep(0.022, 0.0, abs(uv.y - bandY));
+                    // A tear after a cut: the top of the picture slides sideways.
+                    float tear = uTear * smoothstep(0.35, 1.0, uv.y);
+                    float shake = (rand(vec2(line, frame)) - 0.5) * (0.0016 + band * 0.04) + sin(uv.y * 30.0 + uTime * 3.0) * 0.0007;
+                    uv.x += shake + tear * 0.06 * (0.6 + 0.4 * sin(uv.y * 20.0 + uTime * 40.0));
+                    float px = 1.0 / uSize.x;
+                    // Brightness is a little soft; colour is soft and lags to the right.
+                    vec3 l = toYiq(texture2D(uTexSampler, uv).rgb * 0.5
+                        + texture2D(uTexSampler, uv - vec2(px, 0.0)).rgb * 0.25
+                        + texture2D(uTexSampler, uv + vec2(px, 0.0)).rgb * 0.25);
+                    vec3 c = vec3(0.0);
+                    for (int i = 0; i < 8; i++) c += toYiq(texture2D(uTexSampler, uv - vec2(float(i + 2) * 1.6 * px, 0.0)).rgb);
+                    c /= 8.0;
+                    vec3 col = toRgb(vec3(l.x, c.y * 1.1, c.z * 1.1));
+                    col *= 0.93 + 0.07 * sin((1.0 - vUv.y) * uSize.y * 3.14159);
+                    col += (rand(vUv * uSize + frame) - 0.5) * 0.07;
+                    float snow = step(0.7, rand(vec2(floor(vUv.x * uSize.x / 3.0), line + frame)));
+                    col = mix(col, vec3(0.85), band * snow * 0.45);
+                    col = mix(col, vec3(rand(vec2(line, frame))), tear * 0.25 * step(0.7, rand(vec2(line * 3.0, frame))));
+                    gl_FragColor = vec4(clamp(col, 0.0, 1.0), 1.0);
+                }
+            """
+        }
     }
 
-    private fun save(b: Bitmap, f: File) {
-        FileOutputStream(f).use { b.compress(Bitmap.CompressFormat.PNG, 100, it) }
-        b.recycle()
+    /**
+     * What a camcorder wrote over the picture: "PLAY" for the first moments, and the date and time each clip
+     * was filmed, in the corner, in its square letters.
+     */
+    private class Camcorder(context: Context, clips: List<Clip>, private val cuts: List<Long>, private val w: Int, private val h: Int) : BitmapOverlay() {
+        private val font = runCatching { ResourcesCompat.getFont(context, R.font.pt_mono) }.getOrNull() ?: Typeface.MONOSPACE
+        private val stamps = clips.map { paint(if (it.takenAt > 0) date(it.takenAt) else null, null) }
+        private val play = paint(null, "PLAY ▶")
+        private val stampsWithPlay = clips.map { paint(if (it.takenAt > 0) date(it.takenAt) else null, "PLAY ▶") }
+
+        override fun getBitmap(presentationTimeUs: Long): Bitmap {
+            val ms = presentationTimeUs / 1000
+            val i = (cuts.indexOfLast { it <= ms }).coerceIn(0, stamps.lastIndex.coerceAtLeast(0))
+            val playing = ms < 2500
+            return if (stamps.isEmpty()) play else if (playing) stampsWithPlay[i] else stamps[i]
+        }
+
+        private fun date(ms: Long): Pair<String, String> {
+            val t = java.time.Instant.ofEpochMilli(ms).atZone(java.time.ZoneId.systemDefault())
+            val am = if (t.hour < 12) "AM" else "PM"
+            val hour = (t.hour + 11) % 12 + 1
+            val time = "%s %d:%02d".format(am, hour, t.minute)
+            val day = "%s.%2d %d".format(t.month.getDisplayName(java.time.format.TextStyle.SHORT, java.util.Locale.ENGLISH).uppercase(), t.dayOfMonth, t.year)
+            return time to day
+        }
+
+        private fun paint(date: Pair<String, String>?, top: String?): Bitmap {
+            val b = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888)
+            val c = Canvas(b)
+            val size = minOf(w, h) * 0.055f
+            val text = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+                typeface = font; textSize = size; color = Color.rgb(240, 240, 232)
+                setShadowLayer(size * 0.12f, size * 0.06f, size * 0.06f, Color.argb(200, 0, 0, 0))
+            }
+            val pad = minOf(w, h) * 0.06f
+            top?.let { c.drawText(it, pad, pad + size, text) }
+            date?.let { (time, day) ->
+                c.drawText(time, pad, h - pad - size * 1.25f, text)
+                c.drawText(day, pad, h - pad, text)
+            }
+            return b
+        }
     }
 }

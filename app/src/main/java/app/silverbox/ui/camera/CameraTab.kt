@@ -73,7 +73,7 @@ import app.silverbox.ui.theme.UType
 
 /** The counter of the shop and the camera on it: envelopes to collect, the roll being shot, orders at the lab. */
 @Composable
-fun CameraTab(data: LabData, go: Go, loaded: Pickup.Loaded?, dismissLoaded: () -> Unit) {
+fun CameraTab(data: LabData, go: Go, loaded: Pickup.Loaded?, looking: Boolean, dismissLoaded: () -> Unit) {
     val c = ctx()
     Column(Modifier.fillMaxSize().statusBarsPadding().verticalScroll(rememberScrollState()).padding(horizontal = 16.dp)) {
         Row(Modifier.fillMaxWidth().padding(top = 8.dp), verticalAlignment = Alignment.CenterVertically) {
@@ -92,7 +92,7 @@ fun CameraTab(data: LabData, go: Go, loaded: Pickup.Loaded?, dismissLoaded: () -
             Spacer(Modifier.height(12.dp))
         }
 
-        loaded?.let { LoadedCard(it, dismissLoaded) }
+        if (looking || loaded != null) LoadedCard(loaded, looking, dismissLoaded)
 
 
         val roll = data.camera
@@ -168,15 +168,18 @@ private fun ReadyCard(r: Roll, data: LabData, go: Go) {
 }
 
 @Composable
-private fun LoadedCard(l: Pickup.Loaded, dismiss: () -> Unit) {
+private fun LoadedCard(l: Pickup.Loaded?, looking: Boolean, dismiss: () -> Unit) {
     val c = ctx()
     val lines = buildList {
-        if (l.photos > 0) add(T.plural(c, R.plurals.loaded_photos, l.photos))
-        if (l.clips > 0) add(T.plural(c, R.plurals.loaded_clips, l.clips))
-        if (l.leftover > 0) add(T.plural(c, R.plurals.loaded_leftover, l.leftover))
-        if (l.noRoll > 0) add(T.plural(c, R.plurals.loaded_no_roll, l.noRoll))
+        if (l != null) {
+            if (l.photos > 0) add(T.plural(c, R.plurals.loaded_photos, l.photos))
+            if (l.clips > 0) add(T.plural(c, R.plurals.loaded_clips, l.clips))
+            if (l.leftover.isNotEmpty()) add(T.plural(c, R.plurals.loaded_leftover, l.leftover.size))
+            if (l.noRoll.isNotEmpty()) add(T.plural(c, R.plurals.loaded_no_roll, l.noRoll.size))
+        }
+        if (looking) add(stringResource(R.string.loaded_looking))
+        else if (isEmpty()) add(stringResource(R.string.loaded_none))
     }
-    if (lines.isEmpty()) return
     Row(
         Modifier.fillMaxWidth().padding(bottom = 12.dp).clip(U.RMd).background(U.c.mustardSoft).padding(start = 16.dp, top = 12.dp, bottom = 12.dp, end = 4.dp),
         verticalAlignment = Alignment.CenterVertically,
@@ -249,10 +252,10 @@ private fun CassetteCard(roll: Roll, frames: List<Frame>, go: Go) {
             Cassette(roll.stockOf, Modifier.width(72.dp))
             Spacer(Modifier.width(14.dp))
             Column(Modifier.weight(1f)) {
-                Text(stringResource(R.string.cassette).uppercase(), style = UType.Eyebrow)
+                Text(stringResource(if (roll.stockOf.tape) R.string.tape else R.string.cassette).uppercase(), style = UType.Eyebrow)
                 Spacer(Modifier.height(2.dp))
                 Text(T.rollName(c, roll), style = UType.Hand.copy(fontSize = 22.sp, color = U.c.ink), maxLines = 1)
-                Text(stringResource(R.string.cassette_feet, frames.size, roll.capacity) + " · " + stockLabel(roll.stockOf), style = UType.Mono.copy(fontSize = 12.sp, color = U.c.muted))
+                Text(stringResource(if (roll.stockOf.tape) R.string.tape_clips else R.string.cassette_feet, frames.size, roll.capacity) + " · " + stockLabel(roll.stockOf), style = UType.Mono.copy(fontSize = 12.sp, color = U.c.muted))
             }
         }
         if (frames.isNotEmpty()) {

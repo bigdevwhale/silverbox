@@ -42,7 +42,7 @@ class RenderArt {
     @Test
     fun defects() {
         val src = Film.crop(photo("102"))
-        listOf(Defect.FIRST, Defect.LEAK, Defect.CUT).forEach { d -> save(Film.develop(src, Exposure(Stock.SUNNY, 3, d)), "102-${d.name.lowercase()}") }
+        listOf(Defect.FIRST, Defect.LEAK).forEach { d -> save(Film.develop(src, Exposure(Stock.SUNNY, 3, d)), "102-${d.name.lowercase()}") }
         save(Film.develop(src, Exposure(Stock.SUNNY, 3, expired = 1f)), "102-expired")
         for (p in listOf("195", "1008")) {
             val dark = Film.crop(photo(p))

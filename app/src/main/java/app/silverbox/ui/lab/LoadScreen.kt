@@ -27,17 +27,23 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
 import app.silverbox.R
 import app.silverbox.container
+import android.graphics.Bitmap
 import app.silverbox.data.Roll
+import app.silverbox.data.Samples
+import app.silverbox.ui.art.Print
 import app.silverbox.domain.Format
 import app.silverbox.domain.Rules
 import app.silverbox.domain.Stock
@@ -54,6 +60,28 @@ import app.silverbox.ui.components.UTextField
 import app.silverbox.ui.ctx
 import app.silverbox.ui.theme.U
 import app.silverbox.ui.theme.UType
+
+/** Three prints from the film, pinned up beside it; one tapped comes up close. */
+@Composable
+private fun SamplePrints(stock: Stock) {
+    val c = ctx()
+    var close by remember { mutableStateOf<Bitmap?>(null) }
+    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+        Samples.NAMES.forEachIndexed { i, name ->
+            val bmp by produceState<Bitmap?>(null, stock, name) { value = Samples.print(c, stock, name) }
+            Print(
+                bmp,
+                Modifier.weight(1f).rotate(listOf(-2.5f, 1.5f, -1f)[i]).clickable(enabled = bmp != null) { close = bmp },
+                landscape = true, border = 4.dp,
+            )
+        }
+    }
+    close?.let { b ->
+        Dialog(onDismissRequest = { close = null }) {
+            Print(b, Modifier.fillMaxWidth().clickable { close = null }, landscape = true, border = 10.dp)
+        }
+    }
+}
 
 /** The film shelf of the shop: pick a stock, how many frames, and what the roll is for. */
 @Composable
@@ -101,6 +129,10 @@ fun LoadScreen(format: Format, data: LabData, go: Go) {
                     Text(T.stockDesc(c, stock), style = UType.Sub)
                 }
                 if (format == Format.PHOTO) {
+                    SectionTitle(stringResource(R.string.samples))
+                    SamplePrints(stock)
+                }
+                if (format == Format.PHOTO) {
                     SectionTitle(stringResource(R.string.exposures))
                     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                         Rules.SIZES.forEach { n -> Chip(n.toString(), size == n, { size = n }) }
@@ -109,7 +141,16 @@ fun LoadScreen(format: Format, data: LabData, go: Go) {
                 SectionTitle(stringResource(R.string.roll_for))
                 UTextField(name, { name = it.take(40) }, placeholder = stringResource(if (format == Format.MOVIE) R.string.cassette_for_hint else R.string.roll_for_hint))
                 Spacer(Modifier.height(8.dp))
-                Text(stringResource(if (format == Format.MOVIE) R.string.cassette_rules else R.string.roll_rules), style = UType.Muted)
+                Text(
+                    stringResource(
+                        when {
+                            stock.tape -> R.string.tape_rules
+                            format == Format.MOVIE -> R.string.cassette_rules
+                            else -> R.string.roll_rules
+                        }
+                    ),
+                    style = UType.Muted,
+                )
                 Spacer(Modifier.height(24.dp))
             }
         }

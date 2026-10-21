@@ -19,8 +19,6 @@ enum class Defect {
     FIRST,
     /** A stray leak of light from the edge of the frame. */
     LEAK,
-    /** The last frame of a full roll, where the film ran out halfway through. */
-    CUT,
 }
 
 /** Everything the lab needs to know to print one frame. */
@@ -42,10 +40,9 @@ object Film {
     /** The long side of a print, in pixels. */
     const val LONG = 2400
 
-    /** Chooses where light leaks for frame [number] of [count] on a roll that was [full]. */
-    fun defect(number: Int, count: Int, full: Boolean, seed: Int): Defect = when {
+    /** Chooses where light leaks for frame [number] of a roll. */
+    fun defect(number: Int, seed: Int): Defect = when {
         number == 1 -> Defect.FIRST
-        full && number == count && count > 1 -> Defect.CUT
         Random(seed * 31 + number).nextInt(11) == 0 -> Defect.LEAK
         else -> Defect.NONE
     }
@@ -223,7 +220,7 @@ object Film {
         val cx = w / 2f
         val cy = h / 2f
         val diag = sqrt(cx * cx + cy * cy)
-        // Film runs along the long side, so leaks and the cut come in from its ends.
+        // Film runs along the long side, so leaks come in from its ends.
         val along = w >= h
         val len = if (along) w else h
         val leakFrom = when (e.defect) {
@@ -234,7 +231,6 @@ object Film {
         val leakWidth = len * if (e.defect == Defect.FIRST) 0.42f else 0.2f
         val leakPower = if (e.defect == Defect.FIRST) 1f else 0.62f
         val leakPhase = rnd.nextFloat() * 6.28f
-        val cut = if (e.defect == Defect.CUT) len * (0.5f + rnd.nextFloat() * 0.18f) else Float.MAX_VALUE
         val hal = look.halation
         for (y in 0 until h) {
             for (x in 0 until w) {
@@ -275,18 +271,6 @@ object Film {
                         b = 1 - (1 - b) * (1 - lb * k)
                     }
                 }
-                if (t > cut - len * 0.06f) {
-                    val edge = cut + sin(across * 23f + leakPhase) * len * 0.004f
-                    if (t >= edge) {
-                        val fade = ((t - edge) / (len * 0.03f)).coerceIn(0f, 1f)
-                        r = r * (1 - fade) + 0.05f * fade; g = g * (1 - fade) + 0.035f * fade; b = b * (1 - fade) + 0.03f * fade
-                    } else {
-                        // Light fogs the film just before it ends.
-                        val k = ((t - (edge - len * 0.06f)) / (len * 0.06f)).coerceIn(0f, 1f) * 0.55f
-                        r = 1 - (1 - r) * (1 - k); g = 1 - (1 - g) * (1 - 0.45f * k); b = 1 - (1 - b) * (1 - 0.15f * k)
-                    }
-                }
-
                 val l = (0.299f * r + 0.587f * g + 0.114f * b).coerceIn(0f, 1f)
                 // Grain shows most in the mid-tones and hardly at all in the deepest shadows.
                 val amt = look.grain * (0.3f + 2.8f * l * (1 - l))

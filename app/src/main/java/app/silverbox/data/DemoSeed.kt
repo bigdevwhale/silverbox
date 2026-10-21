@@ -118,7 +118,7 @@ object DemoSeed {
             val name = tmp.inputStream().use { c.vault.take(it, "mp4") }
             tmp.delete()
             val d = c.vault.durationMs(c.vault.file(name))
-            dao.insert(Frame(rollId = reel, number = i + 1, original = name, video = true, durationMs = d, clipStartMs = Rules.clipStart(d) + i * 300L, takenAt = at(today.minusDays(108L - i * 4), 11, 0)))
+            dao.insert(Frame(rollId = reel, number = i + 1, original = name, video = true, durationMs = d, takenAt = at(today.minusDays(108L - i * 4), 11, 0)))
         }
         // A cassette in the camera with two clips on it.
         val cassette = dao.insert(Roll(format = Format.MOVIE.name, stock = Stock.HOME8.name, capacity = Rules.CASSETTE, name = if (ru) "Наша осень" else "Our autumn", loadedAt = at(today.minusDays(9), 10, 0)))
@@ -129,7 +129,7 @@ object DemoSeed {
             val name = tmp.inputStream().use { c.vault.take(it, "mp4") }
             tmp.delete()
             val d = c.vault.durationMs(c.vault.file(name))
-            dao.insert(Frame(rollId = cassette, number = i + 1, original = name, video = true, durationMs = d, clipStartMs = Rules.clipStart(d), takenAt = at(today.minusDays(5L - i * 3), 17, 10)))
+            dao.insert(Frame(rollId = cassette, number = i + 1, original = name, video = true, durationMs = d, takenAt = at(today.minusDays(5L - i * 3), 17, 10)))
         }
         c.settings.update { it.copy(onboarded = true, keeper = if (ru) "Аня" else "Anna") }
     }

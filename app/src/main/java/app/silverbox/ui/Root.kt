@@ -41,7 +41,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -85,7 +84,6 @@ import app.silverbox.ui.shelf.RollScreen
 import app.silverbox.ui.shelf.ShelfTab
 import app.silverbox.ui.theme.Nunito
 import app.silverbox.ui.theme.U
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.ZoneId
@@ -138,7 +136,6 @@ fun SilverboxRoot(settings: Settings, shootRequests: Int = 0) {
     val context = LocalContext.current
     val container = context.container
     val nav = rememberNavController()
-    val scope = rememberCoroutineScope()
     var tab by rememberSaveable { mutableStateOf(Tab.CAMERA) }
     val start = remember { if (settings.onboarded) "main" else "welcome" }
 
@@ -146,7 +143,9 @@ fun SilverboxRoot(settings: Settings, shootRequests: Int = 0) {
     val frames by container.db.dao().observeFrames().collectAsStateWithLifecycle(initialValue = null)
     val tick = rememberNow(30_000)
     val data = remember(rolls, frames, settings, tick) { LabData(rolls.orEmpty(), frames.orEmpty(), settings, System.currentTimeMillis()) }
-    var loaded by remember { mutableStateOf<Pickup.Loaded?>(null) }
+    val loaded by container.trips.loaded.collectAsStateWithLifecycle()
+    val looking by container.trips.looking.collectAsStateWithLifecycle()
+    val toBin by container.trips.toBin.collectAsStateWithLifecycle()
 
     val trash = rememberLauncherForActivityResult(ActivityResultContracts.StartIntentSenderForResult()) {}
     val askRead = rememberLauncherForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { granted ->
@@ -170,29 +169,15 @@ fun SilverboxRoot(settings: Settings, shootRequests: Int = 0) {
 
     // Back from the camera: what it took on this one trip goes onto the film, and the trip is over.
     // Anything shot later with the camera on its own stays the keeper's and is never touched.
-    LifecycleEventEffect(Lifecycle.Event.ON_RESUME) {
-        scope.launch {
-            val s = container.settings.now()
-            if (s.shootingSince <= 0) return@launch
-            val since = s.shootingSince
-            // A resume in the instant the camera is being opened (after the permission dialog) is not a return.
-            if (System.currentTimeMillis() - since < 2000) return@launch
-            val until = minOf(System.currentTimeMillis(), since + Pickup.SESSION)
-            container.settings.update { it.copy(shootingSince = 0) }
-            if (!Pickup.canRead(context)) return@launch
-            val got = mutableListOf<Pickup.Loaded>()
-            // A clip the camera is still finishing may land a moment later.
-            for (wait in listOf(0L, 1500L)) {
-                delay(wait)
-                got += Pickup.load(context, container.db, container.vault, since, until)
-            }
-            val uris = got.flatMap { it.uris }
-            val sum = Pickup.Loaded(uris, got.sumOf { it.photos }, got.sumOf { it.clips }, got.sumOf { it.leftover }, got.sumOf { it.noRoll })
-            if (sum.photos + sum.clips + sum.leftover + sum.noRoll > 0) loaded = sum
-            if (s.hide && uris.isNotEmpty()) {
-                Pickup.trashRequest(context, uris)?.let { trash.launch(IntentSenderRequest.Builder(it.intentSender).build()) }
-            }
-            container.changed()
+    LifecycleEventEffect(Lifecycle.Event.ON_RESUME) { container.trips.back() }
+
+    // Once the first pictures have landed, one dialog to move them all to the gallery's bin.
+    LaunchedEffect(toBin, looking) {
+        if (looking || toBin.isEmpty()) return@LaunchedEffect
+        val uris = toBin
+        container.trips.binned(uris)
+        if (container.settings.now().hide) {
+            Pickup.trashRequest(context, uris)?.let { trash.launch(IntentSenderRequest.Builder(it.intentSender).build()) }
         }
     }
 
@@ -212,7 +197,13 @@ fun SilverboxRoot(settings: Settings, shootRequests: Int = 0) {
     }
     LaunchedEffect(data.waiting.size) { if (data.waiting.isNotEmpty()) Alarms.clear(context) }
     // The note about what went on the film belongs to that roll: gone once it is at the lab.
-    LaunchedEffect(data.camera?.id) { if (data.camera == null) loaded = null }
+    var lastCamera by remember { mutableStateOf<Long?>(null) }
+    LaunchedEffect(rolls != null, data.camera?.id) {
+        if (rolls == null) return@LaunchedEffect
+        val now = data.camera?.id
+        if (lastCamera != null && now != lastCamera) container.trips.dismiss()
+        lastCamera = now
+    }
 
     val askNotify = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) {
         container.scope.launch { container.changed() }
@@ -240,7 +231,7 @@ fun SilverboxRoot(settings: Settings, shootRequests: Int = 0) {
                 go.load(Format.PHOTO)
             }
         }
-        composable("main") { MainTabs(tab, { tab = it }, go, data, loaded) { loaded = null } }
+        composable("main") { MainTabs(tab, { tab = it }, go, data, loaded, looking) { container.trips.dismiss() } }
         composable("load/{format}", arguments = listOf(navArgument("format") { type = NavType.StringType })) { e ->
             LoadScreen(runCatching { Format.valueOf(e.arguments?.getString("format").orEmpty()) }.getOrDefault(Format.PHOTO), data, go)
         }
@@ -274,7 +265,7 @@ private fun startShooting(context: android.content.Context) {
     }
     val c = context.container
     c.scope.launch {
-        c.settings.update { it.copy(shootingSince = System.currentTimeMillis()) }
+        c.trips.start()
         runCatching { context.startActivity(Pickup.cameraIntent()) }
     }
 }
@@ -288,11 +279,11 @@ private fun openAppSettings(context: android.content.Context) {
 }
 
 @Composable
-private fun MainTabs(tab: Tab, onTab: (Tab) -> Unit, go: Go, data: LabData, loaded: Pickup.Loaded?, dismissLoaded: () -> Unit) {
+private fun MainTabs(tab: Tab, onTab: (Tab) -> Unit, go: Go, data: LabData, loaded: Pickup.Loaded?, looking: Boolean, dismissLoaded: () -> Unit) {
     Column(Modifier.fillMaxSize().background(U.c.bg)) {
         Box(Modifier.weight(1f)) {
             when (tab) {
-                Tab.CAMERA -> CameraTab(data, go, loaded, dismissLoaded)
+                Tab.CAMERA -> CameraTab(data, go, loaded, looking, dismissLoaded)
                 Tab.ALBUM -> AlbumTab(data, go)
                 Tab.SHELF -> ShelfTab(data, go)
             }

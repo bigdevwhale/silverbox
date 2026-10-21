@@ -27,6 +27,7 @@ object T {
             Stock.SLIDE -> R.string.stock_slide
             Stock.HOME8 -> R.string.stock_home8
             Stock.SILVER8 -> R.string.stock_silver8
+            Stock.VHS -> R.string.stock_vhs
         }
     )
 

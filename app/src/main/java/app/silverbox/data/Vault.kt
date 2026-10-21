@@ -31,7 +31,12 @@ class Vault(private val context: Context) {
     /** Copies a stream in as a new file; returns its name. */
     fun take(input: java.io.InputStream, ext: String): String {
         val name = newName(ext)
-        FileOutputStream(file(name)).use { input.copyTo(it) }
+        try {
+            FileOutputStream(file(name)).use { input.copyTo(it) }
+        } catch (e: Exception) {
+            file(name).delete()
+            throw e
+        }
         return name
     }
 
