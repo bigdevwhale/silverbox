@@ -97,7 +97,10 @@ fun PrintScreen(id: Long, scope: Scope, data: LabData, go: Go) {
     val pager = rememberPagerState(initialPage = start) { list.size }
     var back by rememberSaveable { mutableStateOf(false) }
     var original by rememberSaveable { mutableStateOf(false) }
+    val zoom = remember { Zoom() }
     LaunchedEffect(pager.currentPage) { back = false; original = false }
+    // A new page, the other side or the other picture: start from the whole print again.
+    LaunchedEffect(pager.currentPage, back, original) { zoom.reset() }
     val current = list.getOrNull(pager.currentPage) ?: list[0]
     val roll = data.roll(current.rollId)
     val canOriginal = data.settings.originals && !current.video
@@ -107,10 +110,12 @@ fun PrintScreen(id: Long, scope: Scope, data: LabData, go: Go) {
         TopBar(roll?.let { T.rollName(c, it) } ?: "", onBack = { go.back() }) {
             IconButton(onClick = { coroutines.launch { share(c, current) } }) { Icon(Icons.Rounded.Share, stringResource(R.string.share), tint = U.c.ink) }
         }
-        HorizontalPager(pager, Modifier.weight(1f).fillMaxWidth(), beyondViewportPageCount = 1) { page ->
+        // While a print is brought up close, a swipe moves round it instead of turning to the next one.
+        HorizontalPager(pager, Modifier.weight(1f).fillMaxWidth(), beyondViewportPageCount = 1, userScrollEnabled = !zoom.zoomed) { page ->
             val f = list[page]
+            val here = page == pager.currentPage
             Box(Modifier.fillMaxSize().padding(22.dp), contentAlignment = Alignment.Center) {
-                Turnable(f, back && page == pager.currentPage, original && page == pager.currentPage && canOriginal, data) { back = !back }
+                Turnable(f, back && here, original && here && canOriginal, data, if (here) zoom else null) { back = !back }
             }
         }
         Column(Modifier.fillMaxWidth().padding(horizontal = 20.dp, vertical = 10.dp)) {
@@ -160,9 +165,10 @@ private fun PrintOrOriginal(original: Boolean, onChange: (Boolean) -> Unit) {
 
 /** The print, turning over in 3D to its back; or, when asked, the camera's own picture, whole and without the paper. */
 @Composable
-private fun Turnable(f: Frame, back: Boolean, original: Boolean, data: LabData, onTap: () -> Unit) {
+private fun Turnable(f: Frame, back: Boolean, original: Boolean, data: LabData, zoom: Zoom?, onTap: () -> Unit) {
     val angle by animateFloatAsState(if (back) 180f else 0f, tween(520), label = "turn")
-    val bmp = rememberFull(if (original) f.original else f.print)
+    // Sharp enough to look at closely.
+    val bmp = rememberFull(if (original) f.original else f.print, 2400)
     val landscape = bmp?.let { it.width >= it.height } ?: true
     Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
         val m = Modifier
@@ -171,11 +177,13 @@ private fun Turnable(f: Frame, back: Boolean, original: Boolean, data: LabData, 
                 rotationY = angle
                 cameraDistance = 14 * density
             }
+        // The face can be pinched up close and looked round; the back is for writing on.
+        val face = m.then(if (zoom != null) Modifier.zoomable(zoom, onTap) else Modifier.clickable(onClick = onTap))
         if (original && bmp != null && angle <= 90f) Image(
             bmp.asImageBitmap(), null,
-            m.aspectRatio(bmp.width.toFloat() / bmp.height).shadow(5.dp, RoundedCornerShape(2.dp)).clickable(onClick = onTap),
+            face.aspectRatio(bmp.width.toFloat() / bmp.height).shadow(5.dp, RoundedCornerShape(2.dp)),
         )
-        else if (angle <= 90f) Print(bmp, m.clickable(onClick = onTap), landscape = landscape, border = 10.dp)
+        else if (angle <= 90f) Print(bmp, face, landscape = landscape, border = 10.dp)
         else Back(f, data, landscape, m.graphicsLayer { rotationY = 180f }, onTap)
     }
 }

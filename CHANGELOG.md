@@ -1,5 +1,9 @@
 # Changelog
 
+## [1.4.1]
+
+- Look at a print up close: pinch with two fingers, or double-tap a spot to go close and double-tap again to come back; once close, one finger moves round the picture. Works on the print and on the original, in the roll, the album and the shoebox. A single tap still turns the print over.
+
 ## [1.4.0]
 
 - Every picture from a trip to the camera reaches the film. Cameras that finish a picture after you are back (or a phone that closes the app while the camera is open) no longer lose frames: the gallery is looked at again for two minutes, and a trip carries on after a restart. A long trip counts as long as the pictures keep coming. If the camera took nothing, the app says so.
