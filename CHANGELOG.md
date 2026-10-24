@@ -1,5 +1,11 @@
 # Changelog
 
+<!--
+Telegram: end each version's section with a hidden block for the StillCraft chat. Start it with a
+line "<!-- tg", then 2-4 short lines in Russian for users (what is new, what is fixed), no markdown,
+then close it like any HTML comment. The release notes carry it, and the chat bot posts those lines.
+-->
+
 ## [1.4.1]
 
 - Look at a print up close: pinch with two fingers, or double-tap a spot to go close and double-tap again to come back; once close, one finger moves round the picture. Works on the print and on the original, in the roll, the album and the shoebox. A single tap still turns the print over.
